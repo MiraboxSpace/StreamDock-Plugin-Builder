@@ -1,0 +1,21 @@
+{
+  "name": "streamdock-marketplace",
+  "owner": {
+    "name": "MiraboxSpace"
+  },
+  "metadata": {
+    "description": "Skills for building StreamDock (Mirabox Stream Dock) plugins with AI agents",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "streamdock-plugin-builder",
+      "source": "./",
+      "description": "Build StreamDock plugins from a plain-text description: manifest.json, Node.js backend, keypad/dial action handlers, and the Property Inspector UI.",
+      "version": "1.0.0",
+      "author": { "name": "MiraboxSpace" },
+      "keywords": ["streamdock", "mirabox", "plugin", "skill"],
+      "category": "workflow"
+    }
+  ]
+}

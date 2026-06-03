@@ -1,0 +1,36 @@
+{
+  "SDKVersion": 1,
+  "Author": "YourName",
+  "Name": "Counter",
+  "Description": "A click-counter example plugin. Replace with your own plugin.",
+  "Category": "Counter",
+  "Icon": "static/App-logo.svg",
+  "CategoryIcon": "static/App-logo.svg",
+  "URL": "https://example.com",
+  "Version": "1.0.0",
+  "CodePathWin": "plugin/index.js",
+  "CodePathMac": "plugin/index.js",
+  "OS": [
+    { "Platform": "windows", "MinimumVersion": "10" },
+    { "Platform": "mac", "MinimumVersion": "10.15" }
+  ],
+  "Software": { "MinimumVersion": "3.10.188.226" },
+  "Nodejs": { "Version": "20" },
+  "Actions": [
+    {
+      "UUID": "com.example.streamdock.counter.count",
+      "Name": "Counter",
+      "Tooltip": "Click to count up",
+      "Icon": "static/App-logo.svg",
+      "PropertyInspectorPath": "propertyInspector/count/index.html",
+      "Controllers": ["Keypad"],
+      "DisableAutomaticStates": true,
+      "UserTitleEnabled": false,
+      "SupportedInMultiActions": true,
+      "Settings": { "count": 0, "step": 1 },
+      "States": [
+        { "Image": "static/App-logo.svg", "TitleAlignment": "center", "FontSize": "12" }
+      ]
+    }
+  ]
+}

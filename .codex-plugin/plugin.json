@@ -1,0 +1,17 @@
+{
+  "name": "streamdock-plugin-builder",
+  "version": "1.0.0",
+  "description": "Build StreamDock (Mirabox Stream Dock) plugins from a plain-text description: manifest.json, the Node.js plugin backend, keypad/dial action handlers, and the Property Inspector settings UI.",
+  "author": { "name": "MiraboxSpace" },
+  "homepage": "https://github.com/MiraboxSpace/streamdock-plugin-builder",
+  "repository": "https://github.com/MiraboxSpace/streamdock-plugin-builder",
+  "license": "MIT",
+  "keywords": ["streamdock", "mirabox", "plugin", "property-inspector"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "StreamDock Plugin Builder",
+    "shortDescription": "Build StreamDock plugins from a text description",
+    "longDescription": "An agent skill that turns a plain-text feature description into a complete, installable StreamDock plugin: manifest.json, the Node.js backend, keypad/dial action handlers, the Property Inspector UI, language files, and the build/install step.",
+    "category": "Developer Tools"
+  }
+}

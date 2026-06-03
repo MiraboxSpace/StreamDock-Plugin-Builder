@@ -1,0 +1,8 @@
+# Force LF line endings for text files (a shell script with CRLF fails on
+# Linux/Mac with "bad interpreter").
+* text=auto eol=lf
+
+# Binary files: no line-ending conversion.
+*.png   binary
+*.woff  binary
+*.woff2 binary

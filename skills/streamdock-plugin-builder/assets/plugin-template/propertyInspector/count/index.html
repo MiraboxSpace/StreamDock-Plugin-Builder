@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Counter - Property Inspector</title>
+    <link href="../utils/bootstrap-icons.css" rel="stylesheet">
+    <link href="../utils/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- PI content container: must have class="sdpi-wrapper" -->
+    <div class="sdpi-wrapper p-3">
+        <div class="mb-3">
+            <label class="form-label">Step</label>
+            <!-- type="num" is bound by common.js to "digits only" -->
+            <input type="num" id="step" class="form-control" value="1">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Current Count</label>
+            <input type="text" id="count" class="form-control" readonly>
+        </div>
+        <button id="reset" class="btn btn-primary w-100">Reset</button>
+    </div>
+
+    <!-- Fixed load order: common -> action -> axios -> index -->
+    <script src="../utils/common.js"></script>
+    <script src="../utils/action.js"></script>
+    <script src="../utils/axios.js"></script>
+    <script src="index.js"></script>
+</body>
+
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        padding: 8px;
+        background-color: #2a2a2a;
+        color: #fff;
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+</style>
+
+</html>
