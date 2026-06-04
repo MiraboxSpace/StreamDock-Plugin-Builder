@@ -128,7 +128,7 @@ plugins folder and reloads the plugin automatically — no bundling needed.
 Once everything works, **tell the agent** — for example:
 
 > "Looks good, please build it."  
-> "没问题，打包吧。"  
+> "No problem, pack it."  
 > "Works fine, ship it."
 
 The agent then runs `npm run build`, which bundles the plugin into a single
