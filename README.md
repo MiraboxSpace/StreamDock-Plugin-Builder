@@ -91,14 +91,54 @@ After copying, the directory should contain `SKILL.md` at its top level (e.g.
 
 ## Usage
 
-After installing, just describe what you want in natural language, for example:
+After installing, just describe what you want in natural language. Here are
+some example prompts:
 
 > Make me a StreamDock plugin: pressing the key mutes / unmutes, and the key
 > shows the current state.
 
+> Make me a coin-flip plugin. In the Property Inspector the user can choose how
+> many coins to flip (1–5). Pressing the key plays an ~800 ms SVG frame-by-frame
+> toss animation — the coins arc upward, spin edge-on at the peak, then fall and
+> land showing each result as H (Heads) or T (Tails) directly on the key. The
+> last result stays on the key until the next flip.
+
 The agent loads this skill automatically and follows the workflow: clarify the
 requirements → generate from the template → implement the logic → build and
 install to StreamDock.
+
+### Development workflow (what to expect)
+
+The agent works in two stages. Knowing this helps you get the best result:
+
+**Stage 1 — dev mode (iterate until it works)**
+
+The agent runs `npm run dev`, which installs a thin launcher into StreamDock's
+plugins folder and reloads the plugin automatically — no bundling needed.
+
+- **First time only:** the agent will ask you to restart the StreamDock app
+  once so it picks up the new plugin folder.
+- **After each change:** the agent runs `npm run dev` again; StreamDock
+  reloads the plugin automatically — no more manual restarts.
+- After each `npm run dev` the agent will ask you to **test the plugin in
+  StreamDock and report back**. Fix → dev → test until you're satisfied.
+
+**Stage 2 — build (when you're happy with it)**
+
+Once everything works, **tell the agent** — for example:
+
+> "Looks good, please build it."  
+> "没问题，打包吧。"  
+> "Works fine, ship it."
+
+The agent then runs `npm run build`, which bundles the plugin into a single
+file, installs it, and StreamDock reloads automatically.
+
+> **Why is this step separate?** The dev launcher runs your source code
+> directly and exits after each run so StreamDock can reload it. A production
+> build bundles everything into one file so the plugin runs reliably without
+> a development environment. You need to explicitly ask for the build — the
+> agent will not run it automatically.
 
 ## Repository layout
 

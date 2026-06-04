@@ -7,7 +7,7 @@ description: >-
   Inspector settings UI. Triggers on requests like "write a StreamDock plugin",
   "make a Stream Dock plugin", "StreamDock plugin", or any text describing a
   button/dial behavior to run on a Stream Dock device.
-version: 1.0.0
+version: 1.1.0
 metadata: {"hermes": {"category": "development", "tags": ["streamdock", "mirabox", "plugin"]}}
 ---
 
@@ -28,6 +28,28 @@ UI (the Property Inspector) is a separate HTML page.
 The user wants a plugin that triggers some behavior from a Stream Dock
 key/dial (run a program, send a command, call an API, show dynamic info,
 control volume, etc.).
+
+## DEFAULT RULES — read before writing any build or install command
+
+> **RULE 1 — always use `npm run dev` unless told otherwise.**
+>
+> The default install/test command is **`npm run dev`**, not `npm run build`.
+> Only switch to `npm run build` when the user explicitly confirms the plugin
+> is finished and working (e.g. "好了/没问题/可以打包/build/release/正式版").
+> If the user says nothing about build mode, stay in dev mode.
+> Never silently substitute `npm run build` for `npm run dev` during development.
+
+> **RULE 2 — after every `npm run dev`, ask the user to test and confirm.**
+>
+> After running `npm run dev`, you MUST tell the user to open StreamDock,
+> test the plugin, and report back. Do NOT run `npm run build` on your own
+> initiative. Wait for the user to say it works before proceeding to the build.
+> The handoff message must include:
+> - What was changed
+> - How to test it (which key/action to use)
+> - An explicit prompt: "Please test in StreamDock and let me know when
+>   everything looks good — I'll then run `npm run build` to create the final
+>   installable bundle."
 
 ## Must-know conventions (the easiest mistakes)
 
@@ -50,6 +72,10 @@ control volume, etc.).
    file).
 
 ## Development workflow (follow in order)
+
+> **DEFAULT: use `npm run dev` at Step 7.** Only use `npm run build` when the
+> user explicitly confirms the feature is complete and ready to ship. When in
+> doubt, stay in dev mode.
 
 ### Step 1 — Clarify requirements
 
@@ -114,20 +140,98 @@ missing file breaks the PI under that system language, so keep all of them).
 For automatic PI text translation, see the `$local` section of
 `references/property-inspector.md`.
 
-### Step 7 — Install dependencies, build, install
+### Step 7 — Install dependencies, develop, and build
+
+**First, verify Node.js and npm are available** on the user's machine:
+
+```bash
+node -v
+npm -v
+```
+
+If either command is not found, tell the user to install **Node.js LTS** from
+https://nodejs.org and restart their terminal before continuing. Do not proceed
+until both commands succeed.
 
 ```bash
 cd <plugin-folder>/plugin
-npm install
-npm run build      # ncc bundle + autofile.js auto-copies into the StreamDock plugins folder
+npm install          # installs ws / log4js / fs-extra + @vercel/ncc build tool
 ```
 
-`autofile.js` supports both **Windows and macOS** and picks the plugins folder
-automatically by OS.
+If `npm install` fails due to network issues, retry with the Chinese mirror:
 
-**After build/install completes, you MUST explicitly remind the user to restart
-the StreamDock app** — it only loads or refreshes plugins on restart. Put this
-in the hand-off notes you give the user.
+```bash
+npm install --registry=https://registry.npmmirror.com
+```
+
+#### Standard development workflow
+
+Follow this order unless the user specifically requests otherwise:
+
+**① First run — `npm run dev` + restart StreamDock once**
+
+```bash
+npm run dev
+```
+
+`devfile.js` copies the plugin assets and a thin **launcher script** to the
+StreamDock plugins folder. The launcher runs your development `index.js`
+directly (no bundling needed).
+
+**After the very first `npm run dev`, tell the user to restart the StreamDock
+app once.** The app does not auto-detect newly added plugin folders; a restart
+is needed to load the plugin for the first time. After that single restart, the
+plugin is registered and StreamDock's crash-restart logic takes over.
+
+**② Iterate — `npm run dev` after each backend change (no further restarts)**
+
+Each subsequent `npm run dev` kills the old plugin process and StreamDock
+immediately relaunches it with the latest source. No StreamDock app restart is
+needed from this point on.
+
+> ⚠ StreamDock allows **~50 consecutive plugin restarts** per session.
+> `devfile.js` tracks the restart count in `PluginPath/plugin/.dev-restarts`
+> and prints a warning when you run `npm run dev` if the count is ≥ 45.
+> If the plugin stops responding, run `npm run dev` — it will tell you if the
+> limit was hit — then **restart the StreamDock app** to reset the counter.
+
+Test the feature after each change. Ask the user to confirm it works as
+expected. Fix issues and repeat.
+
+**③ User explicitly confirms → `npm run build` for the final bundle**
+
+> **Do NOT run `npm run build` on your own.** Wait until the user says the
+> plugin works (e.g. "好了", "没问题", "可以了", "looks good", "works fine").
+> If the user has not confirmed, keep iterating in dev mode.
+
+Once the user confirms:
+
+```bash
+npm run build
+```
+
+`npm run build` runs `ncc` to bundle everything into a single `build/index.js`,
+then `autofile.js`:
+1. Kills the running dev launcher process.
+2. Removes the old installed plugin folder.
+3. Copies the bundled plugin to the StreamDock plugins folder.
+4. StreamDock detects the launcher exit and auto-restarts the plugin using
+   the new bundle.
+
+**No manual StreamDock restart is required** when transitioning from dev to
+build mode — the killed process triggers StreamDock's auto-restart.
+
+> Exception: if `npm run build` is run **without** a prior dev session (cold
+> install, no plugin was running), StreamDock will not auto-restart.
+> **Tell the user to restart the StreamDock app manually** in that case.
+> `autofile.js` prints the appropriate message automatically.
+
+> **If the plugin stops working after `npm run build`** (no response, blank
+> key, or action missing from the list), tell the user to **restart the
+> StreamDock app**. The auto-restart only reloads the plugin process — it does
+> not re-read `manifest.json`. Any change to `manifest.json` (UUID, action
+> list, Controllers, States, PropertyInspectorPath, etc.) requires a full app
+> restart to take effect.
 
 If you cannot build (no npm / not the target machine), deliver the whole
 `.sdPlugin` folder to the user and include the install steps from

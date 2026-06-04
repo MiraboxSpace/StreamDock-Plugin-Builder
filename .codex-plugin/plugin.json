@@ -1,6 +1,6 @@
 {
   "name": "streamdock-plugin-builder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Build StreamDock (Mirabox Stream Dock) plugins from a plain-text description: manifest.json, the Node.js plugin backend, keypad/dial action handlers, and the Property Inspector settings UI.",
   "author": { "name": "MiraboxSpace" },
   "homepage": "https://github.com/MiraboxSpace/streamdock-plugin-builder",

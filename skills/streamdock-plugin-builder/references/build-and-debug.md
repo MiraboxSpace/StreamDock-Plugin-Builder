@@ -34,6 +34,16 @@ After copying `assets/plugin-template/`, assume the new plugin ID is
 The app's built-in Node has no `ws / log4js`, so **bundling before shipping is
 mandatory**.
 
+**Prerequisite — Node.js and npm must be installed.** Verify first:
+
+```bash
+node -v   # must print a version, e.g. v20.x.x
+npm -v    # must print a version
+```
+
+If either command is not found, install **Node.js LTS** from https://nodejs.org
+and restart the terminal.
+
 ```bash
 cd <plugin-folder>/plugin
 npm install        # installs fs-extra log4js ws + the build tool @vercel/ncc
@@ -47,6 +57,33 @@ npm run build      # = npx ncc bundle into a single file + node autofile.js auto
 
 > If `ncc` cannot be installed because of network issues, use
 > `npm install --registry=https://registry.npmmirror.com`.
+
+### Development mode — `npm run dev`
+
+For active development, use `npm run dev` instead of `npm run build`:
+
+```bash
+npm run dev        # copies a thin launcher + reloads the plugin in StreamDock
+```
+
+`devfile.js` does three things:
+1. Copies the plugin assets (icons, PI, manifests) to the StreamDock plugins
+   folder.
+2. Writes a thin **launcher** into `PluginPath/plugin/index.js`. The launcher
+   runs your development `index.js` directly using the system Node binary —
+   no bundling required.
+3. Kills any currently running plugin process. StreamDock detects the exit and
+   immediately restarts the plugin, picking up the new launcher (and thus the
+   latest source).
+
+**Workflow:** edit → save → `npm run dev` → StreamDock reloads automatically.
+No StreamDock app restart needed.
+
+> ⚠ StreamDock allows **~50 consecutive plugin restarts** per session (it
+> counts each crash/exit-and-restart). `devfile.js` tracks the count in
+> `PluginPath/plugin/.dev-restarts` and warns you at 45 and 50 when you run
+> `npm run dev`. If the plugin stops responding, run `npm run dev` to check
+> the count, then **restart the StreamDock app** to reset the limit.
 
 ## 4. Plugin install directory
 
@@ -63,18 +100,62 @@ npm run build      # = npx ncc bundle into a single file + node autofile.js auto
 this runs without bundling, but it is large and only suitable for local
 debugging.
 
-## 5. Getting the app to recognize the plugin
+## 5. Standard workflow and StreamDock restart rules
 
-**After every build / plugin update, restart the StreamDock app** — only then
-does it load or refresh plugins. (When you change only the Property Inspector,
-no restart is needed — just reopen the settings panel; see section 6.)
+### Recommended workflow (follow in order)
 
-`autofile.js` also prints a "please restart StreamDock" notice when
-`npm run build` finishes. After restart, the plugin appears under its
-`Category` group in the actions list; drag it onto a key to use it.
+**Step ①** — first install:
 
-> Always state the "restart StreamDock" step explicitly when handing off, or
-> the user will think the plugin failed to install.
+```bash
+npm install
+npm run dev
+```
+
+→ **Restart StreamDock once.** The app does not auto-detect new plugin folders;
+a restart loads the plugin for the first time. After this one restart the plugin
+is registered and the auto-restart logic is active.
+
+**Step ②** — iterate:
+
+```bash
+# edit code, then:
+npm run dev
+```
+
+StreamDock detects the killed process and immediately relaunches the plugin with
+the new source. **No further app restart needed.**
+
+> ⚠ StreamDock allows ~50 consecutive restarts per session. `npm run dev`
+> warns you at 45 and 50; restart the StreamDock app to reset the limit.
+
+**Step ③** — release build:
+
+```bash
+npm run build
+```
+
+`autofile.js` kills the running dev launcher, installs the bundle, and
+StreamDock auto-restarts with the bundled plugin. **No manual restart needed**
+when coming from a dev session.
+
+### Restart reference
+
+| Situation | StreamDock restart needed? |
+|-----------|---------------------------|
+| Very first `npm run dev` (plugin folder is new) | **Yes — once** |
+| Subsequent `npm run dev` | No — auto-restart |
+| `npm run build` after a dev session | No — auto-restart triggered by kill |
+| `npm run build` cold (no prior dev session) | **Yes** — no process to trigger restart |
+| `manifest.json` changed (UUID, actions, Controllers, States…) | **Yes** — manifest is only read on app startup |
+| Property Inspector changes only | No — reopen the key settings panel |
+
+`autofile.js` detects whether a dev process was killed and prints the
+appropriate message ("auto-restarting" vs "please restart manually").
+
+> **Plugin not working after build?** If the plugin stops responding, shows a
+> blank key, or disappears from the action list after `npm run build`, tell the
+> user to restart the StreamDock app. The process auto-restart only reloads the
+> plugin code — `manifest.json` is never re-read until the app restarts.
 
 ## 6. Debugging
 
@@ -84,8 +165,10 @@ no restart is needed — just reopen the settings panel; see section 6.)
 | Property Inspector | open `http://localhost:23519/` in a browser — you can see the PI page there and debug it with DevTools |
 
 After changes:
-- changed the **backend** code → rebuild with `npm run build` and restart the
-  app (or reload the plugin).
+- changed the **backend** code in dev mode → run `npm run dev`; StreamDock
+  restarts the plugin automatically (no app restart needed).
+- changed the **backend** code in build mode → `npm run build` then restart
+  the StreamDock app.
 - changed the **PI** code → just reopen the key's settings panel, no restart
   needed.
 
