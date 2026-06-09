@@ -50,13 +50,26 @@ npm install        # installs fs-extra log4js ws + the build tool @vercel/ncc
 npm run build      # = npx ncc bundle into a single file + node autofile.js auto-install
 ```
 
-`npm run build` does two things:
+`npm run build` does three things:
 1. `ncc` bundles `index.js` and all dependencies into a single `build/index.js`;
-2. `autofile.js` copies the whole `.sdPlugin` folder (with `plugin/` replaced by
+2. `ncc` also bundles `keepalive.js` into `build-keepalive/index.js` (a small
+   helper used for the hot-swap below);
+3. `autofile.js` copies the whole `.sdPlugin` folder (with `plugin/` replaced by
    the bundle) into the StreamDock plugins directory.
 
 > If `ncc` cannot be installed because of network issues, use
 > `npm install --registry=https://registry.npmmirror.com`.
+
+> **Keep-alive handoff:** if the plugin is already running, `autofile.js` does
+> not blindly delete and recopy — that made StreamDock crash-loop a relaunch into
+> a missing `index.js` and burn its 50-restart budget (then the plugin stays dead
+> until the app restarts). Instead it writes the keep-alive bundle over the
+> running `plugin/index.js`, kills the process once so StreamDock relaunches the
+> keep-alive, and the keep-alive copies the real files in and overwrites itself
+> with the production bundle before exiting — handing off to the final version.
+> Cost: ~2 of the 50 restarts, no crash-loop. `npm run build` blocks until the
+> keep-alive writes its `done` marker. If nothing is running, `autofile.js` does a
+> plain in-place copy and asks you to restart the app.
 
 ### Development mode — `npm run dev`
 
@@ -146,16 +159,19 @@ when coming from a dev session.
 | Subsequent `npm run dev` | No — auto-restart |
 | `npm run build` after a dev session | No — auto-restart triggered by kill |
 | `npm run build` cold (no prior dev session) | **Yes** — no process to trigger restart |
-| `manifest.json` changed (UUID, actions, Controllers, States…) | **Yes** — manifest is only read on app startup |
+| `manifest.json` changed (UUID, actions, Controllers, States…) | **Depends on version** — StreamDock **after `3.10.202.0512`** hot-reloads manifest (no restart); **`3.10.202.0512` and earlier** read it only at app startup, so **Yes**, restart |
 | Property Inspector changes only | No — reopen the key settings panel |
 
 `autofile.js` detects whether a dev process was killed and prints the
 appropriate message ("auto-restarting" vs "please restart manually").
 
 > **Plugin not working after build?** If the plugin stops responding, shows a
-> blank key, or disappears from the action list after `npm run build`, tell the
-> user to restart the StreamDock app. The process auto-restart only reloads the
-> plugin code — `manifest.json` is never re-read until the app restarts.
+> blank key, or disappears from the action list after `npm run build`, it is
+> usually a `manifest.json` change. The keep-alive handoff only reloads the
+> plugin code. Manifest hot-reload was implemented **after StreamDock
+> `3.10.202.0512`**: on newer versions the new manifest loads without a restart;
+> on `3.10.202.0512` and earlier, `manifest.json` is only read at app startup, so
+> the user must **restart the StreamDock app** for action-list/manifest changes.
 
 ## 6. Debugging
 
@@ -181,6 +197,7 @@ After changes:
 | backend exits immediately on start | no `npm run build`, the built-in Node cannot find `ws/log4js`; check `log/` for an Uncaught Exception |
 | blank key | `setImage` path/format wrong; the SVG uses `#` colors or features unsupported by SVG Tiny 1.2 (see `recipes.md`); `States[].Image` points to a missing file |
 | plugin not appearing / not updating after a build | the StreamDock app was not restarted |
-| `npm run build` fails with a "file in use" / permission denied / EBUSY error | StreamDock is running and the previously installed plugin is still active — `autofile.js` tries to delete the old copy first but cannot. **Quit StreamDock, then re-run `npm run build`.** |
+| `npm run build` fails with a "file in use" / permission denied / EBUSY error | The keep-alive handoff overwrites the installed `plugin/index.js` while the old process runs; node normally releases that handle, but a watcher/antivirus can hold it. **Quit StreamDock, then re-run `npm run build`** (the not-running path does a plain copy). |
+| `npm run build` prints "Timed out waiting for the keep-alive" | The keep-alive did not finish within ~15 s. Check `plugin/log/keepalive.log` in the **installed** plugin folder; if the plugin did not update, quit and reopen StreamDock and build again. |
 | PI is blank or shows "undefined" | `$local=true` but a language file is missing keys; a JS error (open `localhost:23519` and check the Console) |
 | code changes have no effect | forgot to rebuild the backend; the plugins directory has an old copy |

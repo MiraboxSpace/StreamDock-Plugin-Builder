@@ -25,7 +25,7 @@
       "PropertyInspectorPath": "propertyInspector/count/index.html",
       "Controllers": ["Keypad"],
       "DisableAutomaticStates": true,
-      "UserTitleEnabled": false,
+      "UserTitleEnabled": true,
       "SupportedInMultiActions": true,
       "Settings": { "count": 0, "step": 1 },
       "States": [
