@@ -23,6 +23,7 @@ Go through this item by item after finishing the plugin.
 ## Backend plugin/index.js
 
 - [ ] Lifecycle events use the `_` prefix (`_willAppear` etc.); input events use the bare name (`keyUp` etc.)
+- [ ] A `Crad` action handles input only with `touchTap`; it does not define `keyDown` or `keyUp`
 - [ ] Every `setInterval` is cleared in `_willDisappear`
 - [ ] The first argument of key-operating APIs is `context`
 - [ ] Anywhere `settings` was changed, `setSettings` was called to persist it

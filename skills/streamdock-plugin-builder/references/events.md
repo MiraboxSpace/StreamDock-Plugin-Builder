@@ -26,7 +26,44 @@ fields on every event: `event`; most also have `action` and `context`.
 | `keyDown` | the key is pressed | `settings`, `coordinates`, `state`, `userDesiredState` |
 | `keyUp` | the key is released ("click" usually uses this) | same as above |
 
-### Input — dial / touchscreen (Knob/Encoder)
+These events apply to `Keypad`, including a `Keypad` Control Bar. They are not
+emitted for a `Crad` action.
+
+### Input — card (`Crad`)
+
+| Event | Fires when | Key payload fields |
+|-------|------------|--------------------|
+| `touchTap` | the card is tapped | `settings`, `coordinates`, `state`, `userDesiredState`, `isInMultiAction`, `controller: "Crad"`, optional `hold`, optional `resources`, optional `tapPos [x,y]` |
+
+`Crad` has no `keyDown` or `keyUp`; `touchTap` is its only input event. The
+shared key/tap payload shape is:
+
+```ts
+type keyDownUpTouchTap = {
+  action: string;
+  event: string;
+  context: string;
+  device: string;
+  payload: {
+    settings: {};
+    coordinates: {
+      column: number;
+      row: number;
+    };
+    state: number;
+    userDesiredState: number;
+    isInMultiAction: boolean;
+    controller?: string;
+    hold?: boolean;
+    resources?: {
+      [key: string]: string;
+    };
+    tapPos?: [number, number];
+  };
+};
+```
+
+### Input — dial / touchscreen (Knob)
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
@@ -39,8 +76,19 @@ fields on every event: `event`; most also have `action` and `context`.
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
-| `didReceiveSettings` | this action instance's settings changed | `settings`, `coordinates` |
+| `didReceiveSettings` | this action instance's settings changed | `settings`, `coordinates`, `controller` (`"Crad"` for a card) |
 | `didReceiveGlobalSettings` | global settings changed / after an explicit `getGlobalSettings` | `settings` |
+
+> **Card:** identify this action from the exact event payload marker
+> `controller: "Crad"` (the protocol spelling is intentional). When the user
+> changes its size, `didReceiveSettings.settings` includes `touchbarWidth` and
+> `touchbarHeight`. Redraw the complete card using those dimensions rather than
+> using a fixed or square canvas.
+
+> **Control Bar (formerly Touchbar):** this remains a normal `Keypad` action.
+> Its `didReceiveSettings.settings` also contains `touchbarWidth` and usually
+> `touchbarHeight`. Use those dimensions when present; default a missing height
+> to `66` px for N4Pro. If both are absent, draw it as a square regular key.
 
 ### Property Inspector related
 

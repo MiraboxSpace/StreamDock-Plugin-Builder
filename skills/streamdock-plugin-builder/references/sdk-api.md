@@ -84,6 +84,9 @@ and `didReceiveSettings` reset it to the merge of `default` and the received
 | `_didReceiveSettings` | `sendToPlugin` |
 | `_propertyInspectorDidAppear` | `propertyInspectorDidDisappear` `titleParametersDidChange` |
 
+Controller-specific input still applies: a `Keypad` uses `keyDown`/`keyUp`,
+whereas a `Crad` defines only `touchTap` and must not rely on key events.
+
 Reason: the `Actions` class itself defines four methods —
 `willAppear/willDisappear/didReceiveSettings/propertyInspectorDidAppear` — to
 maintain `this.data`. Defining a method with one of those names **directly**

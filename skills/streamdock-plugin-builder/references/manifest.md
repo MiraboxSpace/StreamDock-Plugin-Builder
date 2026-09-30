@@ -53,9 +53,29 @@ One object per action (one key type):
 | Value | Meaning |
 |-------|---------|
 | `"Keypad"` | standard key (default) |
-| `"Knob"` or `"Encoder"` | dial (rotate/press; some devices have a small screen) |
+| `"Crad"` | resizable card; emits `touchTap`, not `keyDown`/`keyUp` (the spelling is part of the protocol) |
+| `"Knob"` | dial (rotate/press; some devices have a small screen) |
 | `"Information"` | read-only display, does not respond to presses |
 | `"SecondaryScreen"` | secondary screen |
+
+### Card
+
+Card actions use the exact controller marker `"Crad"` (not `"Card"`). The user
+may resize the card, and the backend receives its dimensions through
+`didReceiveSettings` as `settings.touchbarWidth` and
+`settings.touchbarHeight`. Redraw the complete card using that width and height
+instead of treating it as a square key.
+
+A card has no `keyDown` or `keyUp` input events. Handle card interaction with
+`touchTap`; use its optional `tapPos` and `hold` payload fields when needed.
+
+### Control Bar (formerly Touchbar)
+
+Control Bar items remain ordinary `"Keypad"` actions. They also receive their
+dimensions as `settings.touchbarWidth` and `settings.touchbarHeight`. On N4Pro,
+`touchbarHeight` may be absent because its height is fixed; use `66` px in that
+case. If both fields are absent on a `Keypad` action, it is a regular key and
+should be drawn with a square aspect ratio.
 
 Dial actions use the `dialDown / dialUp / dialRotate / touchTap` events (see
 `events.md`).
