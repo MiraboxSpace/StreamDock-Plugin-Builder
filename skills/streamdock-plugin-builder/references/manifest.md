@@ -53,14 +53,14 @@ One object per action (one key type):
 | Value | Meaning |
 |-------|---------|
 | `"Keypad"` | standard key (default) |
-| `"Crad"` | resizable card; emits `touchTap`, not `keyDown`/`keyUp` (the spelling is part of the protocol) |
+| `"Card"` | resizable card; emits `touchTap`, not `keyDown`/`keyUp` |
 | `"Knob"` | dial (rotate/press; some devices have a small screen) |
 | `"Information"` | read-only display, does not respond to presses |
 | `"SecondaryScreen"` | secondary screen |
 
 ### Card
 
-Card actions use the exact controller marker `"Crad"` (not `"Card"`). The user
+Card actions use the exact controller marker `"Card"`. The user
 may resize the card, and the backend receives its dimensions through
 `didReceiveSettings` as `settings.touchbarWidth` and
 `settings.touchbarHeight`. Redraw the complete card using that width and height

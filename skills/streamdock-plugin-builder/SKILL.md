@@ -64,12 +64,12 @@ control volume, etc.).
    setSettings`, etc.).
 4. **Control Bar and card actions use dynamic dimensions.** A Control Bar uses
    the ordinary `"Keypad"` controller, while a card is identified by
-   `controller: "Crad"` (keep this exact protocol spelling). Both use
+   `controller: "Card"`. Both use
    `settings.touchbarWidth` and `settings.touchbarHeight` for drawing. For a
    `Keypad`, the presence of either dimension identifies a Control Bar instance;
    if both are absent it is a regular key and should use a square canvas. On an
    N4Pro Control Bar, a missing `touchbarHeight` defaults to **66 px**.
-5. **`Crad` input is `touchTap` only.** Card actions do not receive `keyDown`
+5. **`Card` input is `touchTap` only.** Card actions do not receive `keyDown`
    or `keyUp`; implement interaction in a bare `touchTap` handler. Its payload
    may include `tapPos: [x, y]` and `hold`.
 6. **Lifecycle events use the `_` prefix** (`_willAppear / _willDisappear /
@@ -94,8 +94,8 @@ affects implementation; otherwise pick a sensible default and state it.
 
 | Question | What it drives |
 |----------|----------------|
-| What hardware triggers it? Standard key / Control Bar (`Keypad`) / card (`Crad`) / dial (Knob) / touchscreen | `Controllers` in `manifest`, which events to use |
-| What happens on press/tap? Run program / command / HTTP / hotkey / open URL | `keyUp` for `Keypad`; `touchTap` for `Crad` |
+| What hardware triggers it? Standard key / Control Bar (`Keypad`) / card (`Card`) / dial (Knob) / touchscreen | `Controllers` in `manifest`, which events to use |
+| What happens on press/tap? Run program / command / HTTP / hotkey / open URL | `keyUp` for `Keypad`; `touchTap` for `Card` |
 | What does the key display? Static icon / dynamic number / dynamic image | whether to use `setImage`/`setTitle`, whether a timer is needed |
 | What does the user configure? (becomes the Property Inspector form) | PI form fields + `settings` keys |
 | How many actions (key types) are needed? | length of the `manifest.Actions` array |
@@ -133,23 +133,23 @@ you need. Available APIs (`setImage / setTitle / setState / setSettings /
 showOk / showAlert / openUrl ...`) are in `references/sdk-api.md`; events and
 payloads are in `references/events.md`.
 
-#### Control Bar (`Keypad`) and card (`Crad`) rendering
+#### Control Bar (`Keypad`) and card (`Card`) rendering
 
 A Control Bar remains a **`Keypad` action**. A card is identified by the exact
-event payload marker `controller: "Crad"` (do not correct it to `Card`). Both
+event payload marker `controller: "Card"`. Both
 types use `settings.touchbarWidth` and `settings.touchbarHeight`; redraw the
 whole image from those values on `_willAppear` and `_didReceiveSettings`.
 
 For `Keypad`, dimension fields distinguish a resizable Control Bar from a
 regular key. If both are absent, render a square key (for example, 144×144).
-If `touchbarHeight` is absent on an N4Pro Control Bar, use 66 px. A `Crad`
+If `touchbarHeight` is absent on an N4Pro Control Bar, use 66 px. A `Card`
 instance is already identified by its controller marker and should use its
 provided dimensions.
 
 ```js
 _didReceiveSettings({ context, payload }) {
     const settings = this.data[context] ?? {};
-    const isCard = payload.controller === "Crad";
+    const isCard = payload.controller === "Card";
     if (isCard) {
         this.render(context, settings.touchbarWidth, settings.touchbarHeight);
         return;
@@ -169,12 +169,12 @@ action has a correctly sized image before a resize occurs.
 
 #### Card interaction
 
-`Crad` does **not** emit `keyDown` or `keyUp`. Put all card tap handling in the
+`Card` does **not** emit `keyDown` or `keyUp`. Put all card tap handling in the
 bare `touchTap` method:
 
 ```js
 touchTap({ context, payload }) {
-    if (payload.controller !== "Crad") return;
+    if (payload.controller !== "Card") return;
     const { tapPos, hold } = payload;
     // Handle a short/long tap at tapPos.
 }

@@ -85,7 +85,7 @@ and `didReceiveSettings` reset it to the merge of `default` and the received
 | `_propertyInspectorDidAppear` | `propertyInspectorDidDisappear` `titleParametersDidChange` |
 
 Controller-specific input still applies: a `Keypad` uses `keyDown`/`keyUp`,
-whereas a `Crad` defines only `touchTap` and must not rely on key events.
+whereas a `Card` defines only `touchTap` and must not rely on key events.
 
 Reason: the `Actions` class itself defines four methods —
 `willAppear/willDisappear/didReceiveSettings/propertyInspectorDidAppear` — to

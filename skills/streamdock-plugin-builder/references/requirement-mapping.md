@@ -9,7 +9,7 @@ backend code choices.
 |---------------------------------|-------------|-------------|
 | "press", "click the button" | `["Keypad"]` | `keyUp` (or `keyDown`) |
 | "Control Bar", "Touchbar", "wide/resizable bar" | `["Keypad"]` | redraw from `touchbarWidth`/`touchbarHeight` in `_willAppear` and `_didReceiveSettings`; use `height ?? 66`; if both are absent, render a square normal key |
-| "card", "card plugin" | `["Crad"]` | `touchTap` only (never `keyDown`/`keyUp`); identify it by `controller: "Crad"`; redraw from `touchbarWidth`/`touchbarHeight` in `_willAppear` and `_didReceiveSettings` |
+| "card", "card plugin" | `["Card"]` | `touchTap` only (never `keyDown`/`keyUp`); identify it by `controller: "Card"`; redraw from `touchbarWidth`/`touchbarHeight` in `_willAppear` and `_didReceiveSettings` |
 | "dial", "rotate", "adjust", "volume knob" | `["Knob"]` | `dialRotate` `dialDown` `dialUp` |
 | "the small screen on the dial", "touchscreen" | `["Knob"]` | `touchTap` + the ones above |
 | "just show info, no pressing" | `["Information"]` | only `_willAppear` + timed refresh |

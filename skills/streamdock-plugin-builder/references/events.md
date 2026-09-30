@@ -27,15 +27,15 @@ fields on every event: `event`; most also have `action` and `context`.
 | `keyUp` | the key is released ("click" usually uses this) | same as above |
 
 These events apply to `Keypad`, including a `Keypad` Control Bar. They are not
-emitted for a `Crad` action.
+emitted for a `Card` action.
 
-### Input — card (`Crad`)
+### Input — card (`Card`)
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
-| `touchTap` | the card is tapped | `settings`, `coordinates`, `state`, `userDesiredState`, `isInMultiAction`, `controller: "Crad"`, optional `hold`, optional `resources`, optional `tapPos [x,y]` |
+| `touchTap` | the card is tapped | `settings`, `coordinates`, `state`, `userDesiredState`, `isInMultiAction`, `controller: "Card"`, optional `hold`, optional `resources`, optional `tapPos [x,y]` |
 
-`Crad` has no `keyDown` or `keyUp`; `touchTap` is its only input event. The
+`Card` has no `keyDown` or `keyUp`; `touchTap` is its only input event. The
 shared key/tap payload shape is:
 
 ```ts
@@ -76,11 +76,11 @@ type keyDownUpTouchTap = {
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
-| `didReceiveSettings` | this action instance's settings changed | `settings`, `coordinates`, `controller` (`"Crad"` for a card) |
+| `didReceiveSettings` | this action instance's settings changed | `settings`, `coordinates`, `controller` (`"Card"` for a card) |
 | `didReceiveGlobalSettings` | global settings changed / after an explicit `getGlobalSettings` | `settings` |
 
 > **Card:** identify this action from the exact event payload marker
-> `controller: "Crad"` (the protocol spelling is intentional). When the user
+> `controller: "Card"`. When the user
 > changes its size, `didReceiveSettings.settings` includes `touchbarWidth` and
 > `touchbarHeight`. Redraw the complete card using those dimensions rather than
 > using a fixed or square canvas.
