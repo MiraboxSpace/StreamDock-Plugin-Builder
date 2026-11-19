@@ -1,18 +1,20 @@
-# StreamDock Plugin Builder Skill
+# StreamDock & Craft Plugin Builder Skills
 
 **English** | [中文](README.zh-CN.md)
 
-A cross-platform **Agent Skill** that lets AI agents (Claude Code / Codex /
-OpenClaw / Hermes) turn a user's **plain-text request** into a complete,
-installable **StreamDock** (Mirabox Stream Dock) plugin, starting from a bundled
-template.
+Two independent **Agent Skills** in one repository for Claude Code, Codex,
+OpenClaw, and Hermes:
 
-- Covers the whole flow: `manifest.json`, the Node.js backend, the Property
-  Inspector, building and installing
-- Bundles a complete working plugin template + 9 reference docs + common-scenario
-  code snippets
-- Standard `SKILL.md` format — **works with Claude Code, Codex, OpenClaw, and
-  Hermes**
+| Skill | Target | Templates |
+| --- | --- | --- |
+| [streamdock-plugin-builder](skills/streamdock-plugin-builder/SKILL.md) | StreamDock keys, dials, Control Bars and cards | Node.js backend + HTML Property Inspector |
+| [craft-plugin-builder](skills/craft-plugin-builder/SKILL.md) | MiraBox Craft display-only secondary-screen widgets | Two templates: Node.js backend + HTML Property Inspector, or a Vue web app. Node.js is the default; request Vue to use the Vue template. |
+
+Both skills include their own templates, protocol references, and development/
+build instructions. Craft's Node PI includes QWebChannel and the tested
+registration/settings-routing fixes. Choose Craft for display widgets and
+StreamDock for physical key/dial interactions; their events and install paths
+are not interchangeable.
 
 ## Installation
 
@@ -26,7 +28,7 @@ Run these in Claude Code, in order:
 ```
 
 The first line registers this repo as a plugin marketplace; the second installs
-the plugin from it. It takes effect in a new session.
+the plugin containing both skills. It takes effect in a new session.
 
 ### Codex (skill-installer)
 
@@ -34,6 +36,7 @@ Run this in Codex:
 
 ```
 $skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/streamdock-plugin-builder
+$skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/craft-plugin-builder
 ```
 
 Codex calls its official script to install the skill into `~/.codex/skills/`.
@@ -46,6 +49,7 @@ Clone the repo, then install the skill from the local path:
 ```
 git clone https://github.com/MiraboxSpace/StreamDock-Plugin-Builder
 openclaw skills install ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder
+openclaw skills install ./StreamDock-Plugin-Builder/skills/craft-plugin-builder
 ```
 
 Add `--global` to install into `~/.openclaw/skills/` for all local agents.
@@ -65,6 +69,8 @@ Clone the repo, then copy the skill folder into the Hermes skills directory:
 git clone https://github.com/MiraboxSpace/StreamDock-Plugin-Builder
 cp -R ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder \
   ~/.hermes/skills/streamdock-plugin-builder
+cp -R ./StreamDock-Plugin-Builder/skills/craft-plugin-builder \
+  ~/.hermes/skills/craft-plugin-builder
 ```
 
 Hermes auto-discovers it on the next startup.
@@ -75,9 +81,14 @@ Hermes auto-discovers it on the next startup.
 Install the StreamDock plugin-builder skill from https://github.com/MiraboxSpace/StreamDock-Plugin-Builder — clone the repo and copy its skills/streamdock-plugin-builder folder to ~/.hermes/skills/streamdock-plugin-builder (so that ~/.hermes/skills/streamdock-plugin-builder/SKILL.md exists), then reload your skills.
 ```
 
+The single-skill prompts above install StreamDock only. For Craft, use the same
+repository with `skills/craft-plugin-builder` and the destination name
+`craft-plugin-builder`; run both installations if both skills are needed.
+
 ### Manual install (any agent)
 
-The skill is a single self-contained folder: `skills/streamdock-plugin-builder/`
+Each skill is a self-contained folder: `skills/streamdock-plugin-builder/`
+or `skills/craft-plugin-builder/`
 (it holds `SKILL.md`, `references/`, and `assets/`). Copy that whole folder into
 the matching directory for your agent:
 
@@ -85,6 +96,10 @@ the matching directory for your agent:
 - Codex: `~/.codex/skills/streamdock-plugin-builder/`
 - OpenClaw: `~/.openclaw/skills/streamdock-plugin-builder/`
 - Hermes: `~/.hermes/skills/streamdock-plugin-builder/`
+
+For Craft, replace `streamdock-plugin-builder` with `craft-plugin-builder` in
+the destination paths above. Copy both folders separately to install both.
+Do not copy generated `node_modules/`, `build/`, `log/`, or old ZIP archives.
 
 After copying, the directory should contain `SKILL.md` at its top level (e.g.
 `~/.hermes/skills/streamdock-plugin-builder/SKILL.md`).
@@ -107,7 +122,17 @@ The agent loads this skill automatically and follows the workflow: clarify the
 requirements → generate from the template → implement the logic → build and
 install to StreamDock.
 
-### Development workflow (what to expect)
+### Craft workflow
+
+Example: “Make a Craft clock widget with configurable colors and resizable layout.”
+Craft defaults to the Node template; explicitly request Vue for the
+`assets/vue-template/`. Windows Node plugins require Craft >= 5.1.018.1021.
+Use `npm run dev`, restart Craft after installation, then test PI settings,
+resizing and multiple instances. Only build after confirmation. See the
+[Craft skill](skills/craft-plugin-builder/SKILL.md) for the complete workflow.
+Do not assume StreamDock's automatic backend reload behavior applies to Craft.
+
+### StreamDock development workflow (what to expect)
 
 The agent works in two stages. Knowing this helps you get the best result:
 
@@ -142,25 +167,27 @@ file, installs it, and StreamDock reloads automatically.
 
 ## Repository layout
 
-```
+```text
 streamdock-plugin-builder/
-├── .claude-plugin/
-│   ├── marketplace.json      # Claude Code plugin marketplace manifest
-│   └── plugin.json           # Claude Code plugin manifest
-├── .codex-plugin/
-│   └── plugin.json           # Codex plugin manifest
+├── .claude-plugin/       # One plugin discovers both skills
+├── .codex-plugin/        # Discovers the skills directory
 └── skills/
-    └── streamdock-plugin-builder/   # the skill — one self-contained folder
-        ├── SKILL.md          # the skill's main file (agent entry point)
-        ├── references/       # 9 reference docs
+    ├── streamdock-plugin-builder/
+    │   ├── SKILL.md
+    │   ├── references/
+    │   └── assets/plugin-template/
+    └── craft-plugin-builder/
+        ├── SKILL.md
+        ├── references/   # Node docs + vue/
         └── assets/
-            └── plugin-template/   # a complete, working plugin template
+            ├── plugin-template/       # Default Node template with QWebChannel
+            └── vue-template/   # Vue template
 ```
 
-All four agents use the same `skills/streamdock-plugin-builder/` folder — Claude
-Code and Codex discover it through their `.claude-plugin/` / `.codex-plugin/`
-manifests, while OpenClaw and Hermes install that folder directly (see above).
-The per-agent manifest files do not affect each other.
+The repository name and plugin ID remain unchanged for existing installations.
+Both skills remain independently installable. Claude Code discovers both via
+the plugin manifest; Codex discovers the skills directory. OpenClaw and Hermes
+can install either folder or both.
 
 ## License
 

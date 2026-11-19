@@ -1,0 +1,10 @@
+{
+  "Name": "Craft Text Card",
+  "Category": "Craft Text Card",
+  "Description": "Node.js Craft plugin",
+  "com.mirabox.streamdock.demo.action1": {
+    "Name": "Text Card",
+    "Tooltip": "Show a text card on the secondary screen"
+  },
+  "Localization": {}
+}

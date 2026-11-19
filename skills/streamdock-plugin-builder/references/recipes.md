@@ -13,6 +13,17 @@ const plugin = new Plugins();
 
 ---
 
+## SDKVersion 3 image sizes
+
+New plugins use `SDKVersion: 3`. Always read the current event's
+`payload.width` / `payload.height`, including regular keys, Control Bars and
+cards. Cache valid pairs per context for timed updates or PI messages, and
+clear them in `_willDisappear`. Use dynamic dimensions for SVG width/height,
+viewBox and layout; do not reuse older settings-based dimensions or a
+fixed square / fixed-height bar. The bundled counter demonstrates this.
+The snippets below focus on behavior; adapt any fixed-size artwork to the
+actual event dimensions before using it.
+
 ## SVG rendering limits (read before drawing SVG with setImage)
 
 StreamDock's SVG rendering module **only implements the SVG Tiny 1.2 subset**;

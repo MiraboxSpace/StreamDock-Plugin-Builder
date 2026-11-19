@@ -1,11 +1,22 @@
 {
   "name": "streamdock-plugin-builder",
-  "description": "Build StreamDock (Mirabox Stream Dock) plugins from a plain-text description: manifest.json, the Node.js plugin backend, keypad/dial action handlers, and the Property Inspector settings UI.",
-  "version": "1.1.0",
-  "author": { "name": "MiraboxSpace" },
+  "description": "Build StreamDock key/dial plugins and MiraBox Craft secondary-screen widgets with two dedicated skills, Node.js templates, a Craft Vue template, Property Inspectors, and build/install workflows.",
+  "version": "1.2.0",
+  "author": {
+    "name": "MiraboxSpace"
+  },
   "license": "MIT",
   "homepage": "https://github.com/MiraboxSpace/streamdock-plugin-builder",
   "repository": "https://github.com/MiraboxSpace/streamdock-plugin-builder",
-  "keywords": ["streamdock", "mirabox", "plugin", "property-inspector"],
-  "skills": ["./skills/streamdock-plugin-builder"]
+  "keywords": [
+    "streamdock",
+    "craft",
+    "mirabox",
+    "plugin",
+    "property-inspector"
+  ],
+  "skills": [
+    "./skills/streamdock-plugin-builder",
+    "./skills/craft-plugin-builder"
+  ]
 }

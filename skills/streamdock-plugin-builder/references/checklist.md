@@ -14,6 +14,8 @@ Go through this item by item after finishing the plugin.
 
 ## manifest
 
+- [ ] `SDKVersion` is `3`
+
 - [ ] `CodePathWin` / `CodePathMac` (or `CodePath`) points to `plugin/index.js`
 - [ ] `OS` covers the target platforms
 - [ ] `Software.MinimumVersion` is set (Windows ≥ 3.10.188.226 when using built-in Node)
@@ -22,8 +24,12 @@ Go through this item by item after finishing the plugin.
 
 ## Backend plugin/index.js
 
+- [ ] Keys, Control Bars and cards render at `payload.width` / `payload.height`, not settings fields or fixed sizes
+- [ ] Dimension caches are per context, survive PI reset messages, update on resize, and are cleared on disappearance
+
 - [ ] Lifecycle events use the `_` prefix (`_willAppear` etc.); input events use the bare name (`keyUp` etc.)
-- [ ] A `Card` action handles input only with `touchTap`; it does not define `keyDown` or `keyUp`
+- [ ] Card input covers the target devices: Mira75 `touchTap`, other devices `touchEvent`; cross-device actions handle both, and cancel never activates a click
+- [ ] N4 Pro dial-screen actions retain dialDown/dialUp and add touchTap for Knob; no firmware-version branch, duplicate fallback, or synthetic dial events
 - [ ] Every `setInterval` is cleared in `_willDisappear`
 - [ ] The first argument of key-operating APIs is `context`
 - [ ] Anywhere `settings` was changed, `setSettings` was called to persist it

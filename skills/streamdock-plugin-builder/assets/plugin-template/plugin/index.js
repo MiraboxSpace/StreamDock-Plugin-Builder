@@ -19,11 +19,12 @@ plugin.didReceiveGlobalSettings = ({ payload: { settings } }) => {
 // StreamDock runs ONE URL-decode on the value it receives, so a raw '#', '%', '<' or space
 // would be mis-decoded and the key renders blank. With proper encoding, '#' hex colors work
 // fine too (rgb(...) / color names are equally fine).
-const renderCount = (n) => {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144">
-        <rect width="144" height="144" fill="rgb(30,30,46)"/>
-        <text x="72" y="92" font-family="Arial" font-size="64" font-weight="bold"
-              fill="rgb(255,255,255)" text-anchor="middle">${n}</text>
+const renderCount = (count, width, height) => {
+    const fontSize = Math.min(width, height) * 0.44;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+        <rect width="${width}" height="${height}" fill="rgb(30,30,46)"/>
+        <text x="${width / 2}" y="${height / 2 + fontSize * 0.32}" font-family="Arial" font-size="${fontSize}" font-weight="bold"
+              fill="rgb(255,255,255)" text-anchor="middle">${count}</text>
     </svg>`;
     return `data:image/svg+xml;charset=utf8,${encodeURIComponent(svg)}`;
 };
@@ -36,18 +37,29 @@ plugin.count = new Actions({
     // when the key first appears.
     default: { count: 0, step: 1 },
 
+    dimensions: new Map(),
+
+    render(context, payload = {}) {
+        if (Number.isFinite(payload.width) && payload.width > 0 &&
+            Number.isFinite(payload.height) && payload.height > 0) {
+            this.dimensions.set(context, { width: payload.width, height: payload.height });
+        }
+        const size = this.dimensions.get(context);
+        if (!size) return;
+        plugin.setImage(context, renderCount(this.data[context].count, size.width, size.height));
+    },
+
     // The key appears on the device: initialize the display with the current count.
-    _willAppear({ context }) {
-        const { count } = this.data[context];
-        plugin.setImage(context, renderCount(count));
+    _willAppear({ context, payload }) {
+        this.render(context, payload);
     },
 
     // Press and release the key: count += step → persist → refresh the display.
-    keyUp({ context }) {
+    keyUp({ context, payload }) {
         const settings = this.data[context];
         settings.count += settings.step;
         plugin.setSettings(context, settings);                // persist
-        plugin.setImage(context, renderCount(settings.count));
+        this.render(context, payload);
         plugin.showOk(context);                               // flash a checkmark on the key
     },
 
@@ -57,17 +69,17 @@ plugin.count = new Actions({
             const settings = this.data[context];
             settings.count = 0;
             plugin.setSettings(context, settings);
-            plugin.setImage(context, renderCount(0));
+            this.render(context);
         }
     },
 
     // The PI changed settings and sends back didReceiveSettings: refresh the display.
-    _didReceiveSettings({ context }) {
-        const { count } = this.data[context];
-        plugin.setImage(context, renderCount(count));
+    _didReceiveSettings({ context, payload }) {
+        this.render(context, payload);
     },
 
     // The key is removed from the device: clean up timers and other resources here.
     _willDisappear({ context }) {
+        this.dimensions.delete(context);
     }
 });

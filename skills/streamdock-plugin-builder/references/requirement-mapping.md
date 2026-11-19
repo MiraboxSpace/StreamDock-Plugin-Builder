@@ -8,10 +8,10 @@ backend code choices.
 | Words in the user's description | Controllers | Main events |
 |---------------------------------|-------------|-------------|
 | "press", "click the button" | `["Keypad"]` | `keyUp` (or `keyDown`) |
-| "Control Bar", "Touchbar", "wide/resizable bar" | `["Keypad"]` | redraw from `touchbarWidth`/`touchbarHeight` in `_willAppear` and `_didReceiveSettings`; use `height ?? 66`; if both are absent, render a square normal key |
-| "card", "card plugin" | `["Card"]` | `touchTap` only (never `keyDown`/`keyUp`); identify it by `controller: "Card"`; redraw from `touchbarWidth`/`touchbarHeight` in `_willAppear` and `_didReceiveSettings` |
+| "Control Bar", "Touchbar", "wide/resizable bar" | `["Keypad"]` | draw at `payload.width` / `payload.height` (SDKVersion 3); cache dimensions per context for later redraws |
+| "card", "card plugin" | `["Card"]` | Mira75: `touchTap` (`tapPos`, `hold`); other devices: `touchEvent` phases; support both for cross-device input; identify cards by `controller: "Card"`; redraw from `payload.width` / `payload.height` in `_willAppear` and `_didReceiveSettings` (SDKVersion 3) |
 | "dial", "rotate", "adjust", "volume knob" | `["Knob"]` | `dialRotate` `dialDown` `dialUp` |
-| "the small screen on the dial", "touchscreen" | `["Knob"]` | `touchTap` + the ones above |
+| "the small screen on the dial", "touchscreen" | `["Knob"]` | retain `dialDown`/`dialUp` and add `touchTap`; N4 Pro older firmware reuses the ordinary dial events, so do not add version checks or a separate fallback |
 | "just show info, no pressing" | `["Information"]` | only `_willAppear` + timed refresh |
 
 ## 2. What happens on press?

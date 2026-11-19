@@ -1,14 +1,18 @@
-# StreamDock Plugin Builder Skill
+# StreamDock & Craft Plugin Builder Skills
 
 [English](README.md) | **中文**
 
-一个跨平台 **Agent Skill**：让 AI 智能体（Claude Code / Codex / OpenClaw /
-Hermes）根据用户的 **文字需求**，从内置模板出发，开发一个完整、可安装的
-**StreamDock**（Mirabox Stream Dock）插件。
+一个仓库，包含两个独立的 **Agent Skills**，支持 Claude Code、Codex、
+OpenClaw 和 Hermes：
 
-- 覆盖 `manifest.json`、Node.js 后端、Property Inspector、构建安装全流程
-- 内置完整可用的插件模板 + 9 份参考文档 + 常见场景代码片段
-- 标准 `SKILL.md` 格式，**Claude Code、Codex、OpenClaw、Hermes 通用**
+| 技能 | 用途 | 模板 |
+| --- | --- | --- |
+| [streamdock-plugin-builder](skills/streamdock-plugin-builder/SKILL.md) | StreamDock 按键、旋钮、控制条和卡片插件 | Node.js 后端 + HTML 属性检查器 |
+| [craft-plugin-builder](skills/craft-plugin-builder/SKILL.md) | MiraBox Craft 纯展示副屏组件 | 支持 Node.js 后端 + HTML 属性检查器、Vue 网页应用两种模板；默认使用 Node.js，也可指定 Vue |
+
+两套技能各自保留模板、协议参考和开发安装流程。Craft Node 模板已包含
+QWebChannel，以及实测修复的连接入口与设置消息路由。副屏展示用 Craft，
+实体按键/旋钮交互用 StreamDock，不能混用事件和安装目录。
 
 ## 安装
 
@@ -21,7 +25,7 @@ Hermes）根据用户的 **文字需求**，从内置模板出发，开发一个
 /plugin install streamdock-plugin-builder@streamdock-marketplace
 ```
 
-第一行把本仓库登记为插件市场，第二行从该市场安装插件。新开会话即生效。
+第一行把本仓库登记为插件市场，第二行安装同时包含两套技能的插件。新开会话即生效。
 
 ### Codex（skill-installer）
 
@@ -29,6 +33,7 @@ Hermes）根据用户的 **文字需求**，从内置模板出发，开发一个
 
 ```
 $skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/streamdock-plugin-builder
+$skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/craft-plugin-builder
 ```
 
 Codex 会调用官方脚本把 skill 装进 `~/.codex/skills/`。装完**重启 Codex**生效。
@@ -40,6 +45,7 @@ Codex 会调用官方脚本把 skill 装进 `~/.codex/skills/`。装完**重启 
 ```
 git clone https://github.com/MiraboxSpace/StreamDock-Plugin-Builder
 openclaw skills install ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder
+openclaw skills install ./StreamDock-Plugin-Builder/skills/craft-plugin-builder
 ```
 
 加 `--global` 可装进 `~/.openclaw/skills/` 供所有本地 agent 使用。新开会话即加载。
@@ -58,6 +64,8 @@ openclaw skills install ./StreamDock-Plugin-Builder/skills/streamdock-plugin-bui
 git clone https://github.com/MiraboxSpace/StreamDock-Plugin-Builder
 cp -R ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder \
   ~/.hermes/skills/streamdock-plugin-builder
+cp -R ./StreamDock-Plugin-Builder/skills/craft-plugin-builder \
+  ~/.hermes/skills/craft-plugin-builder
 ```
 
 Hermes 下次启动会自动发现它。
@@ -68,15 +76,24 @@ Hermes 下次启动会自动发现它。
 帮我安装 StreamDock plugin-builder 技能，来源https://github.com/MiraboxSpace/StreamDock-Plugin-Builder ——clone 这个仓库，把里面的skills/streamdock-plugin-builder 文件夹复制到 ~/.hermes/skills/streamdock-plugin-builder（确保 ~/.hermes/skills/streamdock-plugin-builder/SKILL.md 存在），然后重新加载技能。
 ```
 
+上面的单技能提示词只安装 StreamDock；安装 Craft 时使用同一仓库中的
+`skills/craft-plugin-builder`，目标文件夹名也用 `craft-plugin-builder`。
+需要两套时分别安装。
+
 ### 手动安装（任意智能体）
 
-这个 skill 就是一个自包含文件夹：`skills/streamdock-plugin-builder/`（内含
+每个 skill 都是一个自包含文件夹：`skills/streamdock-plugin-builder/` 或
+`skills/craft-plugin-builder/`（内含
 `SKILL.md`、`references/`、`assets/`）。把它整个复制到对应智能体的目录：
 
 - Claude Code：`~/.claude/skills/streamdock-plugin-builder/`
 - Codex：`~/.codex/skills/streamdock-plugin-builder/`
 - OpenClaw：`~/.openclaw/skills/streamdock-plugin-builder/`
 - Hermes：`~/.hermes/skills/streamdock-plugin-builder/`
+
+安装 Craft 时，将上面目标路径中的 `streamdock-plugin-builder` 替换为
+`craft-plugin-builder`。两套技能分别复制；不要携带生成的 `node_modules/`、
+`build/`、`log/` 或旧 ZIP。
 
 复制后，该目录顶层应直接有 `SKILL.md`（例如
 `~/.hermes/skills/streamdock-plugin-builder/SKILL.md`）。
@@ -92,7 +109,16 @@ Hermes 下次启动会自动发现它。
 智能体会自动加载本技能，按流程执行：理清需求 → 从模板生成 → 实现逻辑 →
 构建并安装到 StreamDock。
 
-### 开发流程（用户须知）
+### Craft 开发流程
+
+示例：“帮我做一个 Craft 时钟组件，可修改配色并随副屏缩放。”
+默认使用 Node 模板；明确说“用 Vue 模板”时使用保留的
+`assets/vue-template/`。Windows Node 插件需要 Craft >= 5.1.018.1021。
+开发运行 `npm run dev`，安装后重启 Craft，测试属性检查器、缩放和多实例，
+确认正常后再打包。完整步骤见 [Craft 技能](skills/craft-plugin-builder/SKILL.md)。
+不要套用 StreamDock 的自动重载行为。
+
+### StreamDock 开发流程（用户须知）
 
 整个过程分两个阶段，了解这点能让你更顺畅地使用：
 
@@ -125,24 +151,26 @@ StreamDock 自动重载。
 
 ## 仓库结构
 
-```
+```text
 streamdock-plugin-builder/
-├── .claude-plugin/
-│   ├── marketplace.json      # Claude Code 插件市场清单
-│   └── plugin.json           # Claude Code 插件清单
-├── .codex-plugin/
-│   └── plugin.json           # Codex 插件清单
+├── .claude-plugin/       # 一个插件发现两套技能
+├── .codex-plugin/        # 扫描 skills 目录
 └── skills/
-    └── streamdock-plugin-builder/   # 技能本体 —— 一个自包含文件夹
-        ├── SKILL.md          # 技能主文件（智能体入口）
-        ├── references/       # 9 份参考文档
+    ├── streamdock-plugin-builder/
+    │   ├── SKILL.md
+    │   ├── references/
+    │   └── assets/plugin-template/
+    └── craft-plugin-builder/
+        ├── SKILL.md
+        ├── references/   # Node 文档 + vue/
         └── assets/
-            └── plugin-template/   # 完整可用的插件模板
+            ├── plugin-template/       # 默认 Node 模板，含 QWebChannel
+            └── vue-template/   # Vue 模板
 ```
 
-四个智能体共用同一个 `skills/streamdock-plugin-builder/` 文件夹：Claude Code 和
-Codex 通过各自的 `.claude-plugin/` / `.codex-plugin/` 清单发现它，OpenClaw 和
-Hermes 则直接安装这个文件夹（见上文）。各自的清单文件互不影响。
+为兼容已有安装，仓库名和插件 ID 不变，两套技能仍可以独立安装。
+Claude Code 插件清单注册两套技能，Codex 扫描 skills 目录；
+OpenClaw 和 Hermes 可按需安装其中一套或两套。
 
 ## License
 

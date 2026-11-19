@@ -62,19 +62,23 @@ control volume, etc.).
 3. **`context`** is the unique ID of "one key instance on the device." It is
    the first argument of almost every operation (`setImage / setTitle /
    setSettings`, etc.).
-4. **Control Bar and card actions use dynamic dimensions.** A Control Bar uses
-   the ordinary `"Keypad"` controller, while a card is identified by
-   `controller: "Card"`. Both use
-   `settings.touchbarWidth` and `settings.touchbarHeight` for drawing. For a
-   `Keypad`, the presence of either dimension identifies a Control Bar instance;
-   if both are absent it is a regular key and should use a square canvas. On an
-   N4Pro Control Bar, a missing `touchbarHeight` defaults to **66 px**.
-5. **`Card` input is `touchTap` only.** Card actions do not receive `keyDown`
-   or `keyUp`; implement interaction in a bare `touchTap` handler. Its payload
-   may include `tapPos: [x, y]` and `hold`.
+4. **Use SDKVersion 3 and event dimensions for every drawable instance.**
+   Read `payload.width` and `payload.height` directly for regular keys,
+   Control Bars (`Keypad`) and cards (`Card`). Do not read dimensions from
+   settings or infer a square key / fixed-height bar from missing fields.
+   Cache the latest valid dimensions per context for timers and PI messages
+   that do not include dimensions; remove the cache on disappearance.
+5. **Card touch input depends on the device, not just the controller.**
+   Mira75 cards emit `touchTap` (one complete tap, `tapPos`, `hold`).
+   Other Card devices emit `touchEvent` (`phase: down/move/up/cancel`,
+   `position`, `touchId`). Implement both for a cross-device card. Do not
+   assume every Card supports dragging or only one event family.
+   N4 Pro's screen above the dial also supports `touchTap` (`Knob`). Keep
+   normal `dialDown/dialUp` handlers and add `touchTap`; older firmware uses
+   those same dial handlers, so no firmware check or extra fallback is needed.
 6. **Lifecycle events use the `_` prefix** (`_willAppear / _willDisappear /
    _didReceiveSettings / _propertyInspectorDidAppear`); **input events use the
-   bare name** (`keyDown / keyUp / dialDown / dialUp / dialRotate / touchTap /
+   bare name** (`keyDown / keyUp / dialDown / dialUp / dialRotate / touchTap / touchEvent /
    sendToPlugin`). Reason: see `references/sdk-api.md`.
 7. **Backend dependencies must be bundled.** The app's built-in Node has no
    `ws / log4js`; before shipping, run `npm run build` (ncc bundles to a single
@@ -95,7 +99,7 @@ affects implementation; otherwise pick a sensible default and state it.
 | Question | What it drives |
 |----------|----------------|
 | What hardware triggers it? Standard key / Control Bar (`Keypad`) / card (`Card`) / dial (Knob) / touchscreen | `Controllers` in `manifest`, which events to use |
-| What happens on press/tap? Run program / command / HTTP / hotkey / open URL | `keyUp` for `Keypad`; `touchTap` for `Card` |
+| What happens on press/tap? Run program / command / HTTP / hotkey / open URL | `keyUp` for `Keypad`; device-dependent `touchTap` / `touchEvent` for `Card` |
 | What does the key display? Static icon / dynamic number / dynamic image | whether to use `setImage`/`setTitle`, whether a timer is needed |
 | What does the user configure? (becomes the Property Inspector form) | PI form fields + `settings` keys |
 | How many actions (key types) are needed? | length of the `manifest.Actions` array |
@@ -123,7 +127,8 @@ decision table, and `references/recipes.md` for minimal code per common scenario
 ### Step 3 — Write manifest.json
 
 Add/remove `Actions` per the requirements; set `Controllers`, `States`,
-`Settings` defaults, `Software.MinimumVersion`, `Nodejs.Version`. Full field
+`Settings` defaults, `SDKVersion: 3`, `Software.MinimumVersion`, and
+`Nodejs.Version`. Full field
 reference: `references/manifest.md`.
 
 ### Step 4 — Write the backend `plugin/index.js`
@@ -135,50 +140,54 @@ payloads are in `references/events.md`.
 
 #### Control Bar (`Keypad`) and card (`Card`) rendering
 
-A Control Bar remains a **`Keypad` action**. A card is identified by the exact
-event payload marker `controller: "Card"`. Both
-types use `settings.touchbarWidth` and `settings.touchbarHeight`; redraw the
-whole image from those values on `_willAppear` and `_didReceiveSettings`.
-
-For `Keypad`, dimension fields distinguish a resizable Control Bar from a
-regular key. If both are absent, render a square key (for example, 144×144).
-If `touchbarHeight` is absent on an N4Pro Control Bar, use 66 px. A `Card`
-instance is already identified by its controller marker and should use its
-provided dimensions.
+A Control Bar remains a **`Keypad` action**. A card is identified by
+`payload.controller === "Card"`. With `SDKVersion: 3`, both receive their
+actual drawing dimensions in `payload.width` and `payload.height`, as do
+regular keys. Dimensions are not user settings.
 
 ```js
+_willAppear({ context, payload }) {
+    this.render(context, payload);
+},
 _didReceiveSettings({ context, payload }) {
-    const settings = this.data[context] ?? {};
-    const isCard = payload.controller === "Card";
-    if (isCard) {
-        this.render(context, settings.touchbarWidth, settings.touchbarHeight);
-        return;
-    }
-
-    const isControlBar = settings.touchbarWidth != null ||
-        settings.touchbarHeight != null;
-    const width = isControlBar ? (settings.touchbarWidth ?? 144) : 144;
-    const height = isControlBar ? (settings.touchbarHeight ?? 66) : width;
-    this.render(context, width, height);
+    this.render(context, payload);
 }
 ```
 
-Use the selected dimensions in the SVG `viewBox`, width/height, text
-positioning, and layout. Apply the same selection in `_willAppear` so the
-action has a correctly sized image before a resize occurs.
+The bundled counter's `render(context, payload)` caches valid dimensions per
+context, then draws an SVG with matching width, height and viewBox. Input
+handlers should also pass their event payload to refresh dimensions.
+Timer callbacks and `sendToPlugin` use the cached dimensions. If no valid
+size has arrived, skip rendering rather than guessing a square or 66 px bar.
+Clear cached dimensions in `_willDisappear`.
 
 #### Card interaction
 
-`Card` does **not** emit `keyDown` or `keyUp`. Put all card tap handling in the
-bare `touchTap` method:
+Use bare `touchTap` and `touchEvent` handlers. Mira75 reports one
+`touchTap` per completed tap, including `tapPos` and `hold`; do not wait
+for a separate release event. Other Card devices report `touchEvent` phases
+with `position`, `startPosition`, `delta` and `touchId`.
+Use `up` to finish an interaction and `cancel` to discard transient state,
+not to trigger a click. Only implement drag behavior on devices that provide
+the phase stream. Both families supply `payload.width / height`.
 
 ```js
 touchTap({ context, payload }) {
     if (payload.controller !== "Card") return;
-    const { tapPos, hold } = payload;
-    // Handle a short/long tap at tapPos.
+    this.render(context, payload);
+    this.activate(context, payload.tapPos, payload.hold);
+},
+touchEvent({ context, payload }) {
+    if (payload.controller !== "Card") return;
+    this.render(context, payload);
+    if (payload.phase === "up") this.activate(context, payload.position, false);
+    if (payload.phase === "cancel") this.cancelTouch?.(context, payload.touchId);
 }
 ```
+
+The snippet's `activate` / `cancelTouch` are action-specific methods, not SDK APIs.
+Handle each device's actual event family; do not synthesize extra clicks or
+rely on `keyDown/keyUp` for card touch input. See `references/events.md`.
 
 ### Step 5 — Write the Property Inspector
 

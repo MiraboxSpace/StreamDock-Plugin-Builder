@@ -7,7 +7,7 @@ plugin metadata and all actions.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `SDKVersion` | Integer | yes | fixed at `1` |
+| `SDKVersion` | Integer | yes | `3` in this template; drawable dimensions arrive as `payload.width` / `payload.height` |
 | `Name` | String | yes | plugin display name |
 | `Description` | String | yes | plugin description |
 | `Author` | String | yes | author |
@@ -53,29 +53,30 @@ One object per action (one key type):
 | Value | Meaning |
 |-------|---------|
 | `"Keypad"` | standard key (default) |
-| `"Card"` | resizable card; emits `touchTap`, not `keyDown`/`keyUp` |
+| `"Card"` | resizable card; Mira75 uses `touchTap`, other devices use `touchEvent` |
 | `"Knob"` | dial (rotate/press; some devices have a small screen) |
 | `"Information"` | read-only display, does not respond to presses |
 | `"SecondaryScreen"` | secondary screen |
 
 ### Card
 
-Card actions use the exact controller marker `"Card"`. The user
-may resize the card, and the backend receives its dimensions through
-`didReceiveSettings` as `settings.touchbarWidth` and
-`settings.touchbarHeight`. Redraw the complete card using that width and height
-instead of treating it as a square key.
+Card actions use the exact controller marker `"Card"`. SDKVersion 3 events
+provide the current dimensions directly in `payload.width` and `payload.height`.
+Use those values in `willAppear`, `didReceiveSettings` and subsequent drawable
+events. Never assume a square card or get dimensions from settings.
+Cache the latest valid pair per context for asynchronous redraws.
 
-A card has no `keyDown` or `keyUp` input events. Handle card interaction with
-`touchTap`; use its optional `tapPos` and `hold` payload fields when needed.
+Card touch input is device-dependent: Mira75 emits `touchTap` with `tapPos`
+and `hold`; other Card devices emit phased `touchEvent`. A cross-device
+plugin should implement both; do not infer the event family from `Card` alone.
+Use `touchEvent` cancel only for cleanup, never click activation.
 
 ### Control Bar (formerly Touchbar)
 
-Control Bar items remain ordinary `"Keypad"` actions. They also receive their
-dimensions as `settings.touchbarWidth` and `settings.touchbarHeight`. On N4Pro,
-`touchbarHeight` may be absent because its height is fixed; use `66` px in that
-case. If both fields are absent on a `Keypad` action, it is a regular key and
-should be drawn with a square aspect ratio.
+Control Bar items remain ordinary `"Keypad"` actions. SDKVersion 3 supplies
+`payload.width` and `payload.height` for bars and regular keys alike.
+Do not infer bar-vs-key from settings fields and do not default the height
+to 66 px. Render the actual per-instance dimensions received from the host.
 
 Dial actions use the `dialDown / dialUp / dialRotate / touchTap` events (see
 `events.md`).

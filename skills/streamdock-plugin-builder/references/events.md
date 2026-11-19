@@ -15,15 +15,15 @@ fields on every event: `event`; most also have `action` and `context`.
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
-| `willAppear` | an action instance appears on the device | `settings`, `coordinates {column,row}`, `controller` |
+| `willAppear` | an action instance appears on the device | `settings`, `coordinates {column,row}`, `controller`, `width`, `height` |
 | `willDisappear` | an action instance is removed from the device | same as above |
-| `titleParametersDidChange` | the user changed the title or its styling | `title`, `titleParameters` |
+| `titleParametersDidChange` | the user changed the title or its styling | `title`, `titleParameters`, `width`, `height` |
 
 ### Input — standard key
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
-| `keyDown` | the key is pressed | `settings`, `coordinates`, `state`, `userDesiredState` |
+| `keyDown` | the key is pressed | `settings`, `coordinates`, `state`, `userDesiredState`, `width`, `height` |
 | `keyUp` | the key is released ("click" usually uses this) | same as above |
 
 These events apply to `Keypad`, including a `Keypad` Control Bar. They are not
@@ -31,37 +31,29 @@ emitted for a `Card` action.
 
 ### Input — card (`Card`)
 
-| Event | Fires when | Key payload fields |
-|-------|------------|--------------------|
-| `touchTap` | the card is tapped | `settings`, `coordinates`, `state`, `userDesiredState`, `isInMultiAction`, `controller: "Card"`, optional `hold`, optional `resources`, optional `tapPos [x,y]` |
+| Device | Event | Key payload fields |
+| --- | --- | --- |
+| Mira75 Card | `touchTap` | `controller: "Card"`, `settings`, `coordinates`, `width`, `height`, `tapPos: [x,y]`, `hold`, `resources` (reserved) |
+| Other Card devices | `touchEvent` | `controller: "Card"`, `settings`, `width`, `height`, `phase`, `touchId`, `position`, `startPosition`, `delta` |
 
-`Card` has no `keyDown` or `keyUp`; `touchTap` is its only input event. The
-shared key/tap payload shape is:
+`controller: "Card"` alone does not determine which touch protocol is used.
+A cross-device card should implement both bare handlers.
 
-```ts
-type keyDownUpTouchTap = {
-  action: string;
-  event: string;
-  context: string;
-  device: string;
-  payload: {
-    settings: {};
-    coordinates: {
-      column: number;
-      row: number;
-    };
-    state: number;
-    userDesiredState: number;
-    isInMultiAction: boolean;
-    controller?: string;
-    hold?: boolean;
-    resources?: {
-      [key: string]: string;
-    };
-    tapPos?: [number, number];
-  };
-};
-```
+`touchTap` is one complete tap result. No down/up pairing is required.
+`hold` distinguishes a long press. It does not provide a drag phase stream.
+
+`touchEvent.phase` is `down`, `move`, `up` or `cancel`.
+Track gestures per context and touchId. The initial Label retains capture:
+position can go negative or exceed the Label bounds. On cancel, discard
+pressed/drag state without activating a click. Every phase includes settings,
+controller, width and height; position/startPosition/delta are Label-local.
+Finish release actions only on up, not on every phase.
+
+Both protocols use the actual `payload.width / height` for drawing and
+coordinate mapping. Do not use a square canvas or settings-based dimensions.
+
+Source: [StreamDock Wiki received events](https://ai.mirabox.net:20001/wiki/wiki-e7gidk72/page/page-16aa5601-444b-4b69-9507-b428baac3577),
+touchTap/touchEvent sections, checked 2026-11-19 (version 36).
 
 ### Input — dial / touchscreen (Knob)
 
@@ -70,25 +62,36 @@ type keyDownUpTouchTap = {
 | `dialDown` | the dial is pressed | `settings`, `controller` |
 | `dialUp` | the dial is released | same as above |
 | `dialRotate` | the dial is rotated | `ticks` (positive = clockwise, negative = counter-clockwise), `pressed` (whether held while rotating) |
-| `touchTap` | the small screen above the dial is tapped | `tapPos [x,y]`, `hold` (whether a long press) |
+| `touchTap` | N4 Pro screen above the dial, on firmware that emits tap events | `controller: "Knob"`, `tapPos [x,y]`, `hold` (whether a long press) |
+
+For N4 Pro, keep the existing dialDown/dialUp handlers and add a bare
+touchTap handler for the screen. Older firmware already reports ordinary
+dialDown/dialUp for screen presses, so those existing handlers cover it.
+Do not add firmware-version detection, a separate old-firmware fallback,
+or synthesize extra dial events from touchTap. If tap and dial release should
+perform the same operation, call a shared action method from both handlers.
+For actions supporting both Card and Knob, dispatch touchTap by controller;
+a Card-only guard would ignore the N4 Pro screen.
 
 ### Settings
 
 | Event | Fires when | Key payload fields |
 |-------|------------|--------------------|
-| `didReceiveSettings` | this action instance's settings changed | `settings`, `coordinates`, `controller` (`"Card"` for a card) |
+| `didReceiveSettings` | this action instance's settings changed | `settings`, `coordinates`, `controller` (`"Card"` for a card), `width`, `height` |
 | `didReceiveGlobalSettings` | global settings changed / after an explicit `getGlobalSettings` | `settings` |
 
-> **Card:** identify this action from the exact event payload marker
-> `controller: "Card"`. When the user
-> changes its size, `didReceiveSettings.settings` includes `touchbarWidth` and
-> `touchbarHeight`. Redraw the complete card using those dimensions rather than
-> using a fixed or square canvas.
+### SDKVersion 3 drawing dimensions
 
-> **Control Bar (formerly Touchbar):** this remains a normal `Keypad` action.
-> Its `didReceiveSettings.settings` also contains `touchbarWidth` and usually
-> `touchbarHeight`. Use those dimensions when present; default a missing height
-> to `66` px for N4Pro. If both are absent, draw it as a square regular key.
+`payload.width` and `payload.height` are the actual drawable pixel dimensions.
+They accompany `willAppear`, `willDisappear`, `didReceiveSettings`,
+`keyDown`, `keyUp` and `titleParametersDidChange`. They are direct payload
+members, not fields inside settings.
+
+For cards (`payload.controller === "Card"`), Control Bars (`Keypad`) and
+regular keys, draw at the supplied dimensions and refresh the image when
+they change. Do not infer a square key or use a fixed bar height.
+Store the latest valid pair per context for events without dimensions
+(such as a PI reset message) and timed redraws; clear it on disappearance.
 
 ### Property Inspector related
 

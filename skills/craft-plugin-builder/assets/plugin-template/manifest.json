@@ -1,0 +1,43 @@
+{
+  "SDKVersion": 1,
+  "Author": "YourName",
+  "Name": "Craft Text Card",
+  "Description": "A Node.js secondary-screen text card",
+  "Category": "Craft Text Card",
+  "Icon": "static/App-logo.svg",
+  "CategoryIcon": "static/App-logo.svg",
+  "Version": "1.0.0",
+  "CodePath": "plugin/index.js",
+  "Nodejs": {
+    "Version": "20"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Actions": [
+    {
+      "UUID": "com.mirabox.streamdock.demo.action1",
+      "Name": "Text Card",
+      "Tooltip": "Show a text card on the secondary screen",
+      "Icon": "static/App-logo.svg",
+      "PropertyInspectorPath": "propertyInspector/action1/index.html",
+      "Controllers": [
+        "SecondaryScreen"
+      ],
+      "Settings": {
+        "ActionGeometry": {
+          "width": 680,
+          "height": 460
+        },
+        "text": "Hello Craft",
+        "bgColor": "#10131a",
+        "textColor": "#ffffff"
+      },
+      "UserTitleEnabled": false,
+      "SupportedInMultiActions": false
+    }
+  ]
+}

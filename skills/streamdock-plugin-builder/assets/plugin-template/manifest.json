@@ -1,5 +1,5 @@
 {
-  "SDKVersion": 1,
+  "SDKVersion": 3,
   "Author": "YourName",
   "Name": "Counter",
   "Description": "A click-counter example plugin. Replace with your own plugin.",

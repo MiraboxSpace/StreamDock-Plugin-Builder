@@ -1,0 +1,10 @@
+{
+  "Name": "Craft 文字卡片",
+  "Category": "文字卡片",
+  "Description": "Node.js Craft plugin",
+  "com.mirabox.streamdock.demo.action1": {
+    "Name": "文字卡片",
+    "Tooltip": "在副屏显示文字卡片"
+  },
+  "Localization": {}
+}

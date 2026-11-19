@@ -80,12 +80,14 @@ and `didReceiveSettings` reset it to the merge of `default` and the received
 | Use the `_` prefix (SDK intercepts, then forwards) | Use the bare name (forwarded directly) |
 |------|------|
 | `_willAppear` | `keyDown` `keyUp` |
-| `_willDisappear` | `dialDown` `dialUp` `dialRotate` `touchTap` |
+| `_willDisappear` | `dialDown` `dialUp` `dialRotate` `touchTap` `touchEvent` |
 | `_didReceiveSettings` | `sendToPlugin` |
 | `_propertyInspectorDidAppear` | `propertyInspectorDidDisappear` `titleParametersDidChange` |
 
 Controller-specific input still applies: a `Keypad` uses `keyDown`/`keyUp`,
-whereas a `Card` defines only `touchTap` and must not rely on key events.
+whereas Card touch input uses `touchTap` on Mira75 and `touchEvent` on other
+devices. Both are bare handlers; implement both when targeting multiple devices.
+The controller alone does not identify a touch protocol.
 
 Reason: the `Actions` class itself defines four methods —
 `willAppear/willDisappear/didReceiveSettings/propertyInspectorDidAppear` — to
