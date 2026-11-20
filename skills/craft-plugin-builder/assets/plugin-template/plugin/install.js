@@ -35,5 +35,10 @@ module.exports = function install(mode) {
         fs.cpSync(bundle, path.join(target, 'plugin'), { recursive: true });
     }
     console.log(`Installed ${mode} plugin to ${target}`);
-    console.log('Restart Craft to load the installed code and manifest. Test before requesting a production build.');
+    if (mode === 'dev') {
+        console.log('DEVELOPMENT VERSION: restart Craft and test settings, resizing and multiple widgets.');
+        console.log('Please confirm it works, then ask for a production build. This launcher is not shareable.');
+    } else {
+        console.log('PRODUCTION VERSION installed. Restart Craft to load it; the installer is generated next.');
+    }
 };

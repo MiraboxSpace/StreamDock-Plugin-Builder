@@ -1,0 +1,14 @@
+{
+  "Name": "Κάρτα κειμένου Craft",
+  "Category": "Κάρτα κειμένου Craft",
+  "Description": "Κάρτα κειμένου για τη δευτερεύουσα οθόνη Craft",
+  "com.mirabox.streamdock.demo.action1": {
+    "Name": "Κάρτα κειμένου",
+    "Tooltip": "Εμφάνιση κάρτας κειμένου στη δευτερεύουσα οθόνη"
+  },
+  "Localization": {
+    "Text": "Κείμενο",
+    "Background": "Φόντο",
+    "Text color": "Χρώμα κειμένου"
+  }
+}

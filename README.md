@@ -165,6 +165,19 @@ file, installs it, and StreamDock reloads automatically.
 > a development environment. You need to explicitly ask for the build — the
 > agent will not run it automatically.
 
+## Shareable installers
+
+After a confirmed production request, each template's `npm run build` installs
+the production version and automatically creates a shareable installer under
+the project's `release/` directory. Dock `.sdPlugin` ZIPs contain one same-named
+wrapper folder; Craft `.mPanelPlugin` ZIPs put manifest.json directly at root.
+Neither output has a `.zip` suffix. The agent provides the installer file link
+and actual installation path, not just compiled files. Development deliveries
+are explicitly labeled and require testing before release.
+
+You can share these installers with other users or publish them at
+[Space](https://space.mirabox.net/contentUpload).
+
 ## Repository layout
 
 ```text

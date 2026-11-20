@@ -1,0 +1,14 @@
+{
+  "Name": "計數器",
+  "Description": "點擊計數器示範插件",
+  "Category": "計數器",
+  "com.example.streamdock.counter.count": {
+    "Name": "計數器",
+    "Tooltip": "點擊增加計數"
+  },
+  "Localization": {
+    "Step": "步長",
+    "Current Count": "目前計數",
+    "Reset": "重設"
+  }
+}

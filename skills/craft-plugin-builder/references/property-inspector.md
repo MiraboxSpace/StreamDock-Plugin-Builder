@@ -22,8 +22,9 @@ The shared helper adapts Dock's $settings / $propEvent pattern to Craft.
   a new top-level object to trigger the proxy.
 - $propEvent.didReceiveSettings initializes/re-syncs form values, including
   position-derived values. Do not save from this callback, avoiding loops.
-- $propEvent.connected(info) selects UI language; the example uses en/zh_CN
-  and English fallback. Root language JSON files localize plugin/action names.
+- $propEvent.connected(info) selects UI language; the example translates all
+  14 supported locales and falls back to English for unknown languages.
+  Root language JSON files localize plugin/action names and tooltips.
 - $websocket.sendToPlugin(payload), getGlobalSettings(), setGlobalSettings(payload)
   and openUrl(url) send the matching Craft messages.
 - $propEvent.sendToPropertyInspector(payload) and

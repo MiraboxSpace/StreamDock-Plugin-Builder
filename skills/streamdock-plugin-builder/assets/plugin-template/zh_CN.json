@@ -1,10 +1,10 @@
 {
   "Name": "计数器",
-  "Description": "点击计数示例插件",
+  "Description": "点击计数器示例插件",
   "Category": "计数器",
   "com.example.streamdock.counter.count": {
     "Name": "计数器",
-    "Tooltip": "点击累加"
+    "Tooltip": "点击增加计数"
   },
   "Localization": {
     "Step": "步长",

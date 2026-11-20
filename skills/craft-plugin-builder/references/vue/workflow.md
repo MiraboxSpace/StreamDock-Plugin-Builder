@@ -12,6 +12,13 @@ metadata: {"hermes": {"category": "development", "tags": ["craft", "mirabox", "p
 
 # MiraBox Craft Plugin Development
 
+For release delivery, also follow `../packaging.md`: label each dev delivery
+as a development version, ask the user to test and confirm, then complete
+production build + active-directory installation + installer generation when
+requested. Always provide the shareable `.mPanelPlugin` file (ZIP with no
+wrapper directory) and https://space.mirabox.net/contentUpload. Compiling with
+Vite alone is not a production delivery.
+
 ## Purpose
 
 Turn a user's **plain-text request** into a complete, installable **MiraBox

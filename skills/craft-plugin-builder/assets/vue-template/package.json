@@ -4,6 +4,8 @@
   "scripts": {
     "dev": "node ./script/autofile.cjs dev && vite",
     "build": "vite build && node ./script/autofile.cjs",
+    "postbuild": "node ./script/package.cjs",
+    "package": "node ./script/package.cjs",
     "format": "prettier . --write"
   },
   "dependencies": {
@@ -16,6 +18,7 @@
     "@types/node": "^20.11.10",
     "@vitejs/plugin-vue": "^5.0.4",
     "fs-extra": "^11.2.0",
+    "fflate": "^0.8.2",
     "naive-ui": "^2.38.1",
     "prettier": "^3.2.5",
     "sass": "^1.71.1",

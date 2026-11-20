@@ -1,0 +1,14 @@
+{
+  "Name": "Craft metin kartı",
+  "Category": "Craft metin kartı",
+  "Description": "Craft ikincil ekranı için metin kartı",
+  "com.mirabox.streamdock.demo.action1": {
+    "Name": "Metin kartı",
+    "Tooltip": "İkincil ekranda bir metin kartı göster"
+  },
+  "Localization": {
+    "Text": "Metin",
+    "Background": "Arka plan",
+    "Text color": "Metin rengi"
+  }
+}

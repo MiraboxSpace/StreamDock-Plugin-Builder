@@ -1,14 +1,14 @@
 {
-  "Name": "Counter",
-  "Description": "A click-counter example plugin",
-  "Category": "Counter",
+  "Name": "Счётчик",
+  "Description": "Пример плагина счётчика нажатий",
+  "Category": "Счётчик",
   "com.example.streamdock.counter.count": {
-    "Name": "Counter",
-    "Tooltip": "Click to count up"
+    "Name": "Счётчик",
+    "Tooltip": "Нажмите, чтобы увеличить счётчик"
   },
   "Localization": {
-    "Step": "Step",
-    "Current Count": "Current Count",
-    "Reset": "Reset"
+    "Step": "Шаг",
+    "Current Count": "Текущее значение",
+    "Reset": "Сбросить"
   }
 }

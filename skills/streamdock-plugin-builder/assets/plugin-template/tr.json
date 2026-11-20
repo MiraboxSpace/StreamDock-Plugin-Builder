@@ -1,0 +1,14 @@
+{
+  "Name": "Sayaç",
+  "Description": "Örnek tıklama sayacı eklentisi",
+  "Category": "Sayaç",
+  "com.example.streamdock.counter.count": {
+    "Name": "Sayaç",
+    "Tooltip": "Sayacı artırmak için tıklayın"
+  },
+  "Localization": {
+    "Step": "Artış",
+    "Current Count": "Geçerli sayı",
+    "Reset": "Sıfırla"
+  }
+}

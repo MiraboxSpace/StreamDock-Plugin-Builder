@@ -1,14 +1,14 @@
 {
-  "Name": "Counter",
-  "Description": "A click-counter example plugin",
-  "Category": "Counter",
+  "Name": "Licznik",
+  "Description": "Przykładowa wtyczka licznika kliknięć",
+  "Category": "Licznik",
   "com.example.streamdock.counter.count": {
-    "Name": "Counter",
-    "Tooltip": "Click to count up"
+    "Name": "Licznik",
+    "Tooltip": "Kliknij, aby zwiększyć licznik"
   },
   "Localization": {
-    "Step": "Step",
-    "Current Count": "Current Count",
-    "Reset": "Reset"
+    "Step": "Przyrost",
+    "Current Count": "Bieżący stan licznika",
+    "Reset": "Wyzeruj"
   }
 }

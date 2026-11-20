@@ -1,15 +1,19 @@
-// Property Inspector text, by app language. Add keys as your PI grows.
 const base = {
   text: 'Text',
   bgColor: 'Background',
-  textColor: 'Text Color',
+  textColor: 'Text color',
   coordinates: 'Coordinates'
 };
 
 export const useI18nStore = () => {
   const language = window.argv[3].application.language;
-  const L: Record<string, typeof base> = {
-    en: { ...base },
+  const labels: Record<string, typeof base> = {
+    en: {
+      text: 'Text',
+      bgColor: 'Background',
+      textColor: 'Text color',
+      coordinates: 'Coordinates'
+    },
     zh_CN: {
       text: '文字',
       bgColor: '背景颜色',
@@ -20,7 +24,37 @@ export const useI18nStore = () => {
       text: '文字',
       bgColor: '背景顏色',
       textColor: '文字顏色',
-      coordinates: '插件坐標'
+      coordinates: '插件座標'
+    },
+    de: {
+      text: 'Text',
+      bgColor: 'Hintergrund',
+      textColor: 'Textfarbe',
+      coordinates: 'Koordinaten'
+    },
+    el: {
+      text: 'Κείμενο',
+      bgColor: 'Φόντο',
+      textColor: 'Χρώμα κειμένου',
+      coordinates: 'Συντεταγμένες'
+    },
+    es: {
+      text: 'Texto',
+      bgColor: 'Fondo',
+      textColor: 'Color del texto',
+      coordinates: 'Coordenadas'
+    },
+    fr: {
+      text: 'Texte',
+      bgColor: 'Arrière-plan',
+      textColor: 'Couleur du texte',
+      coordinates: 'Coordonnées'
+    },
+    it: {
+      text: 'Testo',
+      bgColor: 'Sfondo',
+      textColor: 'Colore del testo',
+      coordinates: 'Coordinate'
     },
     ja: {
       text: 'テキスト',
@@ -33,7 +67,31 @@ export const useI18nStore = () => {
       bgColor: '배경색',
       textColor: '글자색',
       coordinates: '좌표'
+    },
+    pl: {
+      text: 'Tekst',
+      bgColor: 'Tło',
+      textColor: 'Kolor tekstu',
+      coordinates: 'Współrzędne'
+    },
+    pt: {
+      text: 'Texto',
+      bgColor: 'Fundo',
+      textColor: 'Cor do texto',
+      coordinates: 'Coordenadas'
+    },
+    ru: {
+      text: 'Текст',
+      bgColor: 'Фон',
+      textColor: 'Цвет текста',
+      coordinates: 'Координаты'
+    },
+    tr: {
+      text: 'Metin',
+      bgColor: 'Arka plan',
+      textColor: 'Metin rengi',
+      coordinates: 'Koordinatlar'
     }
   };
-  return L[language] ?? L['en'];
+  return labels[language] ?? labels.en;
 };

@@ -6,7 +6,7 @@
 // $back:  whether you decide when to show the UI yourself (false = show
 //         automatically once settings are received).
 // $dom:   collect static DOM elements here.
-const $local = false, $back = false, $dom = {
+const $local = true, $back = false, $dom = {
     main: $('.sdpi-wrapper'),
     step: $('#step'),
     count: $('#count'),

@@ -1,0 +1,14 @@
+{
+  "Name": "Μετρητής",
+  "Description": "Παράδειγμα πρόσθετου μετρητή κλικ",
+  "Category": "Μετρητής",
+  "com.example.streamdock.counter.count": {
+    "Name": "Μετρητής",
+    "Tooltip": "Κάντε κλικ για αύξηση"
+  },
+  "Localization": {
+    "Step": "Βήμα",
+    "Current Count": "Τρέχουσα μέτρηση",
+    "Reset": "Επαναφορά"
+  }
+}

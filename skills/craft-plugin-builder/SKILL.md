@@ -15,6 +15,36 @@ The Vue template is available in `assets/vue-template/`, with its documentation
 in `references/vue/`. Use it when the user requests a Vue plugin.
 Do not use the old template ZIP for new projects.
 
+Both templates include 14 locales: `de`, `el`, `en`, `es`, `fr`, `it`, `ja`,
+`ko`, `pl`, `pt`, `ru`, `tr`, `zh_CN`, and `zh_HK`. Keep plugin/action names,
+tooltips and PI labels translated together. Vue emits the language JSON files
+from `src/manifest.cjs`; Node ships them at the plugin root.
+
+## Development and release handoff
+
+After every development delivery, explicitly say **this is a development
+version**, explain which widget/settings/resize behavior to test, and ask the
+user to confirm it works before requesting a production build. Do not end with
+only “done/installed”. Node dev launchers depend on local source; Vue dev
+installs depend on Vite. Neither is a distributable release.
+
+An explicit request to make a production/release version authorizes the whole
+release workflow: **build, install into the active Craft plugins directory,
+and create the installer**. Do not stop at `npm run bundle` or `vite build`;
+those only compile. Do not ask for the same build approval again. If replacing
+files requires Craft to be closed, arrange that handoff and resume installation;
+report a blocker instead of calling a compile-only result an installed release.
+
+For both templates, run `npm run build` from the documented package directory.
+It installs via the bundled installer and runs `postbuild` to produce
+`<project>/release/<plugin-id>.mPanelPlugin`. Verify the installed entry and
+archive before delivery. Craft archives have **manifest.json at ZIP root**,
+no wrapper folder and no `.zip` suffix. Always return the installer file's
+absolute path/link, the actual install directory, and any restart instruction.
+Tell the user it can be shared with others or uploaded to
+[Space](https://space.mirabox.net/contentUpload). Do not upload without a request.
+See `references/packaging.md` for structure and older-project integration.
+
 ## Required Craft differences
 
 - Windows Craft **5.1.018.1021 or newer** supports the built-in Node launcher.
@@ -59,7 +89,7 @@ Do not use the old template ZIP for new projects.
 1. Map the request to display content, data source, configurable settings,
    actions, refresh rate, and language; use sensible defaults where possible.
 2. Copy `assets/plugin-template/` into a new project, excluding generated
-   `plugin/node_modules/`, `plugin/build/`, and `plugin/log/` if present.
+   `plugin/node_modules/`, `plugin/build/`, `plugin/log/`, and `release/` if present.
    Edit `manifest.json`
    directly; synchronize action UUID suffixes, `plugin.<suffix>`, PI paths,
    and language-file UUID keys. See `references/manifest.md`.
@@ -82,6 +112,10 @@ Do not use the old template ZIP for new projects.
    and on-screen resize), and ask them to confirm it works in Craft.
    Only after confirmation/request for release run `npm run build`.
    `npm run bundle` is available for non-installing build validation.
+8. On a production request, complete build + active-directory installation +
+   installer creation, verify all three, then deliver the shareable archive.
+   If `postbuild` is missing in an existing project, add the packaging scripts
+   or use the skill's helper as described in `references/packaging.md`.
 
 ## References
 
@@ -93,6 +127,7 @@ Do not use the old template ZIP for new projects.
 | `references/sdk-api.md` | Calling backend helpers and binary images |
 | `references/property-inspector.md` | Editing settings, Qt files, coordinates |
 | `references/build-and-debug.md` | Installing, bundling, debugging |
+| `references/packaging.md` | Release installation, installer format and sharing |
 | `references/requirement-mapping.md` | Choosing an implementation |
 | `references/recipes.md` | Timers, HTTP, rendering, alarms |
 | `references/checklist.md` | Validating delivery |

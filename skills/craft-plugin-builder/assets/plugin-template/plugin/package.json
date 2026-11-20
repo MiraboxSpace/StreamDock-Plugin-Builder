@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "node devfile.js",
     "bundle": "ncc build index.js -m -o build",
-    "build": "npm run bundle && node autofile.js"
+    "build": "npm run bundle && node autofile.js",
+    "postbuild": "node package.cjs",
+    "package": "node package.cjs"
   },
   "dependencies": {
     "ws": "^8.14.2",
     "log4js": "^6.9.1"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.38.1"
+    "@vercel/ncc": "^0.38.1",
+    "fflate": "^0.8.2"
   }
 }

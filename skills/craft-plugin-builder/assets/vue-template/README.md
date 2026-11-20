@@ -18,11 +18,20 @@ npm run dev          # generates a dev manifest + starts the Vite dev server
 The first time, restart the Craft app once so it loads the new plugin folder.
 After that, edits hot-reload through the Vite dev server (`http://localhost:5173`).
 
+This is a development version that depends on Vite. Test it and confirm it
+works before requesting a production release.
+
 ## Build (final, installable)
 
 ```bash
 npm run build        # single-file build + installs into Craft's plugins folder
 ```
+
+The npm postbuild hook also creates `release/<plugin-id>.mPanelPlugin`.
+Its ZIP contents start with manifest.json directly, without a wrapper folder
+or `.zip` suffix. Share the installer with others or upload it to
+https://space.mirabox.net/contentUpload. `npm run package` only recreates the
+archive from existing dist files and does not build or install.
 
 ## Where things live
 

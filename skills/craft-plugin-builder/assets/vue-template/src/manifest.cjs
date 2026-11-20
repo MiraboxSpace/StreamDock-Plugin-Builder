@@ -20,17 +20,62 @@ const Plugin = {
   APIVersion: '1.0',
   Icon: 'images/icon.svg',
   i18n: {
-    en:    { Name: 'Demo',  Description: 'A Craft secondary-screen demo plugin' },
-    zh_CN: { Name: '演示',  Description: 'Craft 副屏演示插件' },
-    zh_HK: { Name: '演示',  Description: 'Craft 副屏演示插件' },
-    ja:    { Name: 'Demo',  Description: 'Craft セカンダリスクリーンのデモプラグイン' },
-    ko:    { Name: 'Demo',  Description: 'Craft 보조 화면 데모 플러그인' },
-    fr:    { Name: 'Demo',  Description: 'Plugin de démonstration pour écran secondaire Craft' },
-    de:    { Name: 'Demo',  Description: 'Craft-Demo-Plugin für den Zweitbildschirm' },
-    es:    { Name: 'Demo',  Description: 'Complemento de demostración de pantalla secundaria de Craft' },
-    it:    { Name: 'Demo',  Description: 'Plugin demo per schermo secondario Craft' },
-    ru:    { Name: 'Demo',  Description: 'Демонстрационный плагин вторичного экрана Craft' },
-    pl:    { Name: 'Demo',  Description: 'Wtyczka demonstracyjna ekranu pomocniczego Craft' }
+    en: {
+      Name: 'Demo',
+      Description: 'A Craft secondary-screen demo plugin'
+    },
+    zh_CN: {
+      Name: '演示',
+      Description: 'Craft 副屏演示插件'
+    },
+    zh_HK: {
+      Name: '示範',
+      Description: 'Craft 副屏示範插件'
+    },
+    de: {
+      Name: 'Demo',
+      Description: 'Ein Demo-Plugin für den Craft-Zweitbildschirm'
+    },
+    el: {
+      Name: 'Επίδειξη',
+      Description: 'Πρόσθετο επίδειξης για τη δευτερεύουσα οθόνη Craft'
+    },
+    es: {
+      Name: 'Demostración',
+      Description: 'Complemento de demostración para la pantalla secundaria de Craft'
+    },
+    fr: {
+      Name: 'Démonstration',
+      Description: 'Plugin de démonstration pour l’écran secondaire Craft'
+    },
+    it: {
+      Name: 'Dimostrazione',
+      Description: 'Plugin dimostrativo per lo schermo secondario Craft'
+    },
+    ja: {
+      Name: 'デモ',
+      Description: 'Craft サブ画面用デモプラグイン'
+    },
+    ko: {
+      Name: '데모',
+      Description: 'Craft 보조 화면용 데모 플러그인'
+    },
+    pl: {
+      Name: 'Demo',
+      Description: 'Wtyczka demonstracyjna na dodatkowy ekran Craft'
+    },
+    pt: {
+      Name: 'Demonstração',
+      Description: 'Plugin de demonstração para a tela secundária do Craft'
+    },
+    ru: {
+      Name: 'Демонстрация',
+      Description: 'Демонстрационный плагин для дополнительного экрана Craft'
+    },
+    tr: {
+      Name: 'Demo',
+      Description: 'Craft ikincil ekranı için örnek eklenti'
+    }
   }
 };
 
@@ -39,17 +84,62 @@ const Actions = [
     UUID: 'action1',
     Icon: 'images/icon.svg',
     i18n: {
-      en:    { Name: 'Text Card', Tooltip: 'Show a text card on the secondary screen' },
-      zh_CN: { Name: '文字卡片', Tooltip: '在副屏上显示一张文字卡片' },
-      zh_HK: { Name: '文字卡片', Tooltip: '在副屏上顯示一張文字卡片' },
-      ja:    { Name: 'Text Card', Tooltip: 'セカンダリスクリーンにテキストカードを表示' },
-      ko:    { Name: 'Text Card', Tooltip: '보조 화면에 텍스트 카드 표시' },
-      fr:    { Name: 'Text Card', Tooltip: 'Afficher une carte de texte sur l’écran secondaire' },
-      de:    { Name: 'Text Card', Tooltip: 'Eine Textkarte auf dem Zweitbildschirm anzeigen' },
-      es:    { Name: 'Text Card', Tooltip: 'Mostrar una tarjeta de texto en la pantalla secundaria' },
-      it:    { Name: 'Text Card', Tooltip: 'Mostra una scheda di testo sullo schermo secondario' },
-      ru:    { Name: 'Text Card', Tooltip: 'Показать текстовую карточку на вторичном экране' },
-      pl:    { Name: 'Text Card', Tooltip: 'Pokaż kartę tekstową na ekranie pomocniczym' }
+      en: {
+        Name: 'Text Card',
+        Tooltip: 'Show a text card on the secondary screen'
+      },
+      zh_CN: {
+        Name: '文字卡片',
+        Tooltip: '在副屏上显示文字卡片'
+      },
+      zh_HK: {
+        Name: '文字卡片',
+        Tooltip: '在副屏上顯示文字卡片'
+      },
+      de: {
+        Name: 'Textkarte',
+        Tooltip: 'Eine Textkarte auf dem Zweitbildschirm anzeigen'
+      },
+      el: {
+        Name: 'Κάρτα κειμένου',
+        Tooltip: 'Εμφάνιση κάρτας κειμένου στη δευτερεύουσα οθόνη'
+      },
+      es: {
+        Name: 'Tarjeta de texto',
+        Tooltip: 'Mostrar una tarjeta de texto en la pantalla secundaria'
+      },
+      fr: {
+        Name: 'Carte de texte',
+        Tooltip: 'Afficher une carte de texte sur l’écran secondaire'
+      },
+      it: {
+        Name: 'Scheda di testo',
+        Tooltip: 'Mostra una scheda di testo sullo schermo secondario'
+      },
+      ja: {
+        Name: 'テキストカード',
+        Tooltip: 'サブ画面にテキストカードを表示'
+      },
+      ko: {
+        Name: '텍스트 카드',
+        Tooltip: '보조 화면에 텍스트 카드 표시'
+      },
+      pl: {
+        Name: 'Karta tekstowa',
+        Tooltip: 'Wyświetl kartę tekstową na dodatkowym ekranie'
+      },
+      pt: {
+        Name: 'Cartão de texto',
+        Tooltip: 'Mostrar um cartão de texto na tela secundária'
+      },
+      ru: {
+        Name: 'Текстовая карточка',
+        Tooltip: 'Показать текстовую карточку на дополнительном экране'
+      },
+      tr: {
+        Name: 'Metin kartı',
+        Tooltip: 'İkincil ekranda bir metin kartı göster'
+      }
     },
     state: 0,
     States: [{ FontSize: '10', TitleAlignment: 'bottom' }],

@@ -21,3 +21,7 @@
 - [ ] Dev install followed by Craft restart and explicit user testing request.
 - [ ] Release requested/confirmed before npm run build and production installation.
 - [ ] Bundle contains dependencies and assets; dev absolute source paths excluded.
+- [ ] Dev handoff explicitly says development version, asks for testing and confirmation, and does not imply portability.
+- [ ] Production request completes build, active-directory installation and installer generation; archive entries verified.
+- [ ] Craft `.mPanelPlugin` archive has manifest.json at root, no wrapper folder, no dev launcher/logs/dependencies, and no .zip suffix.
+- [ ] Delivery includes absolute installer link, actual install path, restart instruction and sharing/Space upload explanation.

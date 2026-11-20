@@ -1,14 +1,14 @@
 {
-  "Name": "Counter",
-  "Description": "A click-counter example plugin",
-  "Category": "Counter",
+  "Name": "カウンター",
+  "Description": "クリックカウンターのサンプルプラグイン",
+  "Category": "カウンター",
   "com.example.streamdock.counter.count": {
-    "Name": "Counter",
-    "Tooltip": "Click to count up"
+    "Name": "カウンター",
+    "Tooltip": "クリックしてカウントを増やす"
   },
   "Localization": {
-    "Step": "Step",
-    "Current Count": "Current Count",
-    "Reset": "Reset"
+    "Step": "増分",
+    "Current Count": "現在のカウント",
+    "Reset": "リセット"
   }
 }

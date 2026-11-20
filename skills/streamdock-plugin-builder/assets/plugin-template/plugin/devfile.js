@@ -19,6 +19,8 @@ const skip = [
     path.join('plugin', 'index.js'),
     path.join('plugin', 'autofile.js'),
     path.join('plugin', 'devfile.js'),
+    path.join('plugin', 'installer.cjs'),
+    path.join('plugin', 'package.cjs'),
     path.join('plugin', 'package.json'),
     path.join('plugin', 'package-lock.json'),
     path.join('plugin', 'pnpm-lock.yaml'),
@@ -26,7 +28,8 @@ const skip = [
     path.join('plugin', 'build'),
     path.join('plugin', 'log'),
     '.git',
-    '.vscode'
+    '.vscode',
+    'release'
 ];
 
 // Embed the system node path and dev source path at script-run time so the

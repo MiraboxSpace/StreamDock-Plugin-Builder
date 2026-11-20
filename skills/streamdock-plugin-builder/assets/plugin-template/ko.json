@@ -1,14 +1,14 @@
 {
-  "Name": "Counter",
-  "Description": "A click-counter example plugin",
-  "Category": "Counter",
+  "Name": "카운터",
+  "Description": "클릭 카운터 예제 플러그인",
+  "Category": "카운터",
   "com.example.streamdock.counter.count": {
-    "Name": "Counter",
-    "Tooltip": "Click to count up"
+    "Name": "카운터",
+    "Tooltip": "클릭하여 카운트 증가"
   },
   "Localization": {
-    "Step": "Step",
-    "Current Count": "Current Count",
-    "Reset": "Reset"
+    "Step": "증가량",
+    "Current Count": "현재 카운트",
+    "Reset": "초기화"
   }
 }

@@ -13,6 +13,8 @@ system Node and source tree. It does not bundle and is not distributable.
 Restart Craft to load it. Close Craft before replacing an existing installation.
 After code changes, rerun dev and restart Craft; reopen the PI to inspect edits.
 Always ask the user to test text/colors, resizing, and multiple widget instances.
+Explicitly label this as a development version and ask for confirmation before
+the production build. Explain that it is not yet a shareable installer.
 Only after confirmation or an explicit release request:
 
 ```powershell
@@ -20,6 +22,12 @@ npm run build
 ```
 
 Build runs ncc and installs all emitted output files, including extra assets.
+The npm postbuild hook then generates `release/<plugin-id>.mPanelPlugin` in
+the project root. It contains ZIP bytes with manifest.json directly at root,
+not a same-named wrapper folder. A production request requires build AND
+installation AND this installer. Return its absolute file link and actual
+install path, say it can be shared, and provide
+https://space.mirabox.net/contentUpload for publishing. See `packaging.md`.
 For automated compilation without installing, use npm run bundle.
 For native graphics packages, validate binaries against target OS/architecture
 and Craft's actual Node runtime; ncc does not make native modules portable.

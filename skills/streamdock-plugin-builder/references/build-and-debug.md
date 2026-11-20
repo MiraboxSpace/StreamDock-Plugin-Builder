@@ -1,5 +1,15 @@
 # Naming, building, installing, debugging
 
+## Shareable release installer
+
+After a successful `npm run build` and local installation, npm's `postbuild`
+creates `release/<plugin-folder-name>.sdPlugin`. This is ZIP data containing
+one same-named `.sdPlugin` folder with its manifest inside. Provide its
+absolute file link, actual install path and restart requirements; tell the
+user it can be shared or uploaded to https://space.mirabox.net/contentUpload.
+See `packaging.md` for archive verification and older-project integration.
+Compilation alone is not a completed production release.
+
 ## 1. Naming rules
 
 | Thing | Rule | Example |

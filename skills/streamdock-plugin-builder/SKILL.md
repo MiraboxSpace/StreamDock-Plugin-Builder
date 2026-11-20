@@ -199,9 +199,10 @@ drop the PI**: remove `PropertyInspectorPath` from the manifest.
 ### Step 6 — Localization (optional)
 
 The app loads `<lang>.json` by the system language. Edit the matching file when
-you need to localize the plugin/action names. The template ships 11 language
-files (`en`/`zh_CN` translated, the other 9 are English fallback copies; a
-missing file breaks the PI under that system language, so keep all of them).
+you need to localize the plugin/action names. The template ships 14 translated
+language files: `de`, `el`, `en`, `es`, `fr`, `it`, `ja`, `ko`, `pl`, `pt`,
+`ru`, `tr`, `zh_CN`, and `zh_HK`. Keep all of them and retain the PI's
+matching `Localization` keys; the counter PI enables automatic translation.
 For automatic PI text translation, see the `$local` section of
 `references/property-inspector.md`.
 
@@ -265,6 +266,15 @@ expected. Fix issues and repeat.
 
 **③ User explicitly confirms → `npm run build` for the final bundle**
 
+An explicit production/release request authorizes build, local installation,
+and installer creation together. Do not stop after ncc compilation. The
+template's `postbuild` automatically generates
+`<plugin-folder>/release/<plugin-folder-name>.sdPlugin` after installation
+succeeds. The ZIP must contain exactly one same-named `.sdPlugin` wrapper
+folder, with its manifest inside. Do not distribute a dev launcher or raw
+source ZIP. See `references/packaging.md`, including integration for existing
+projects without the new scripts.
+
 > **Do NOT run `npm run build` on your own.** Wait until the user says the
 > plugin works (e.g. "好了", "没问题", "可以了", "looks good", "works fine").
 > If the user has not confirmed, keep iterating in dev mode.
@@ -318,6 +328,12 @@ If you cannot build (no npm / not the target machine), deliver the whole
 
 ### Step 8 — Debug and verify
 
+After each successful production build, verify the installed backend and
+installer, and give the user the install directory plus an absolute link to
+the `.sdPlugin` installer. Say it can be shared with other users and uploaded
+to [Space](https://space.mirabox.net/contentUpload). Preserve its exact filename
+(no `.zip` or download `(1)` suffix). Never upload unless requested.
+
 Restart the StreamDock app so it picks up the new plugin; debug with the
 methods in `references/build-and-debug.md` (`localhost:23519`, the
 `plugin/log/` log file). Self-check against `references/checklist.md` before
@@ -333,6 +349,7 @@ delivery.
 | `references/sdk-api.md` | The bundled `Plugins/Actions/log` API and the front-end API |
 | `references/property-inspector.md` | PI development: forms, settings persistence, file picker, i18n |
 | `references/build-and-debug.md` | Naming/rename checklist, build, install paths, debugging |
+| `references/packaging.md` | Installer generation, ZIP layout, verification and sharing |
 | `references/requirement-mapping.md` | "User requirement → plugin capability" decision table |
 | `references/recipes.md` | Minimal working code for common scenarios |
 | `references/checklist.md` | Pre-delivery self-check list |

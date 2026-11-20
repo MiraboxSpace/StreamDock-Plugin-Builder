@@ -89,6 +89,10 @@ This runs `vite build && node ./script/autofile.cjs`:
 2. `autofile.cjs` generates the production `manifest.json` (`CodePath` /
    `PropertyInspectorPath` = `index.html`) and every `dist/<lang>.json`, then
    copies `dist/` into Craft's plugins folder.
+3. npm runs `postbuild` to create `release/<plugin-id>.mPanelPlugin`, a ZIP
+   without an outer folder or `.zip` suffix. Always deliver this file with
+   the actual install path and sharing/Space upload instructions. See
+   `../packaging.md`. `vite build` alone is not a completed release.
 
 Tell the user to **reload the widget (or restart Craft)** to pick up the
 production bundle (the webview is now loading the bundled file instead of the

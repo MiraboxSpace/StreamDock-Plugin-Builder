@@ -30,6 +30,8 @@ const skip = [
     path.join('plugin', 'autofile.js'),
     path.join('plugin', 'devfile.js'),
     path.join('plugin', 'keepalive.js'),
+    path.join('plugin', 'installer.cjs'),
+    path.join('plugin', 'package.cjs'),
     path.join('plugin', 'package.json'),
     path.join('plugin', 'package-lock.json'),
     path.join('plugin', 'pnpm-lock.yaml'),
@@ -38,7 +40,8 @@ const skip = [
     path.join('plugin', 'build-keepalive'),
     path.join('plugin', 'log'),
     '.git',
-    '.vscode'
+    '.vscode',
+    'release'
 ];
 
 function isPluginRunning() {
@@ -154,6 +157,7 @@ function installViaKeepalive() {
     } else {
         console.warn('Timed out waiting for the keep-alive to finish.');
         console.warn('If the plugin did not update, quit and reopen StreamDock, then build again.');
+        process.exit(1);
     }
 }
 

@@ -54,6 +54,9 @@ Go through this item by item after finishing the plugin.
 
 - [ ] `npm install` in `plugin/` succeeded
 - [ ] `npm run build` succeeded and produced `build/index.js`
+- [ ] The production build installed the current bundle and postbuild created `release/<plugin-name>.sdPlugin`; not just an ncc output.
+- [ ] Installer ZIP contains exactly one same-named `.sdPlugin` wrapper with manifest.json inside; excludes dev launchers, logs and build dependencies.
+- [ ] User receives the absolute installer link and install path, plus sharing and https://space.mirabox.net/contentUpload instructions.
 - [ ] The StreamDock app has been restarted
 - [ ] The plugin appears in the StreamDock actions list
 - [ ] Dragged onto a key, the core feature works as required

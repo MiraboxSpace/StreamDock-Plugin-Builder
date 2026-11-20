@@ -74,16 +74,11 @@ Object.keys(i18n).forEach((item) => {
   obj.Category = i18n[item].Name;
   obj.Description = i18n[item].Description;
   manifest.Actions.forEach((action) => {
+    const translation = action.i18n[item] || action.i18n.en;
     obj[action.UUID] = {
-      // Name: action.i18n[item].Name,
-      Name: action.i18n['en'].Name,
-      Tooltip: action.i18n['en'].Tooltip
-      // Tooltip: action.i18n[item].Tooltip
+      Name: translation.Name,
+      Tooltip: translation.Tooltip
     };
-    if (item == "zh_CN") {
-      obj[action.UUID].Name = action.i18n[item].Name;
-      obj[action.UUID].Tooltip = action.i18n[item].Tooltip;
-    }
   });
   obj.Localization = {};
   fs.writeJSONSync(`./dist/${item}.json`, obj);
@@ -109,3 +104,9 @@ if (isInside(relativeTarget) || isInside(relativeSource)) {
 fs.ensureDirSync(PluginPath);
 fs.copySync('./dist', PluginPath);
 console.log(`Installed plugin to ${PluginPath}`);
+if (process.argv[2] === 'dev') {
+  console.log('DEVELOPMENT VERSION: test in Craft, then confirm it works before requesting a production build.');
+  console.log('Keep the Vite server running. This development installation is not shareable.');
+} else {
+  console.log('PRODUCTION VERSION installed. Reload Craft; the installer is generated next.');
+}

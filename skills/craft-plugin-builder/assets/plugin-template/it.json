@@ -1,10 +1,14 @@
 {
-  "Name": "Craft Text Card",
-  "Category": "Craft Text Card",
-  "Description": "Node.js Craft plugin",
+  "Name": "Scheda di testo Craft",
+  "Category": "Scheda di testo Craft",
+  "Description": "Una scheda di testo per lo schermo secondario Craft",
   "com.mirabox.streamdock.demo.action1": {
-    "Name": "Text Card",
-    "Tooltip": "Show a text card on the secondary screen"
+    "Name": "Scheda di testo",
+    "Tooltip": "Mostra una scheda di testo sullo schermo secondario"
   },
-  "Localization": {}
+  "Localization": {
+    "Text": "Testo",
+    "Background": "Sfondo",
+    "Text color": "Colore del testo"
+  }
 }

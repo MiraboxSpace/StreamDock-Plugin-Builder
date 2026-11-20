@@ -1,0 +1,5 @@
+plugin/node_modules/
+plugin/build/
+plugin/build-keepalive/
+plugin/log/
+release/
