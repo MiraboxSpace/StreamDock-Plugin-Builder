@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ColorWave</title>
+  <meta description="Color waves on a fixed 320 by 200 lighting canvas.">
+  <meta publisher="YourName">
+  <meta property="bgColor" label="Background Color" type="color" default="#101020">
+  <meta property="waveColor" label="Wave Color" type="color" default="#30d5ff">
+  <meta property="colorMode" label="Color Mode" type="combobox" values="Rainbow,Static Color" default="Rainbow">
+  <meta property="lampSpeed" label="Lamp Speed" type="number" min="0" max="100" default="50">
+  <meta property="showLines" label="Show Lines" type="boolean" default="1">
+</head>
+<body style="margin:0;padding:0;background:#000;overflow:hidden">
+  <canvas id="exCanvas" width="320" height="200"></canvas>
+  <script>
+    var defaults = { bgColor: '#101020', waveColor: '#30d5ff', colorMode: 'Rainbow', lampSpeed: 50, showLines: 1 };
+    Object.keys(defaults).forEach(function (key) {
+      if (typeof window[key] === 'undefined') window[key] = defaults[key];
+    });
+    var canvas, context, animationId = null, lastTime = null, elapsed = 0;
+
+    function validColor(value, fallback) {
+      return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
+    }
+
+    function drawFrame(timestamp) {
+      animationId = null;
+      var speed = Number(window.lampSpeed);
+      if (!Number.isFinite(speed)) speed = defaults.lampSpeed;
+      speed = Math.max(0, Math.min(100, speed));
+      if (lastTime !== null) elapsed += Math.min(100, Math.max(0, timestamp - lastTime)) * speed / 50000;
+      lastTime = timestamp;
+      context.fillStyle = validColor(window.bgColor, defaults.bgColor);
+      context.fillRect(0, 0, 320, 200);
+      var staticColor = validColor(window.waveColor, defaults.waveColor);
+      var rainbow = window.colorMode === 'Rainbow';
+      var lines = window.showLines === true || window.showLines === 1 || window.showLines === '1' || window.showLines === 'true';
+      for (var band = 0; band < 5; band++) {
+        context.beginPath();
+        for (var horizontal = 0; horizontal <= 320; horizontal += 4) {
+          var vertical = 100 + Math.sin(horizontal / 58 + elapsed + band * 0.85) * (25 + band * 9);
+          if (horizontal === 0) context.moveTo(horizontal, vertical);
+          else context.lineTo(horizontal, vertical);
+        }
+        context.strokeStyle = rainbow ? 'hsl(' + ((elapsed * 45 + band * 52) % 360) + ', 90%, 60%)' : staticColor;
+        context.lineWidth = lines ? 5 + band : 18 + band * 3;
+        context.globalAlpha = lines ? 0.85 : 0.2;
+        context.stroke();
+      }
+      context.globalAlpha = 1;
+      animationId = requestAnimationFrame(drawFrame);
+    }
+
+    function stopAnimation() {
+      if (animationId !== null) cancelAnimationFrame(animationId);
+      animationId = null;
+      lastTime = null;
+    }
+
+    function startAnimation() {
+      stopAnimation();
+      canvas = document.getElementById('exCanvas');
+      canvas.width = 320;
+      canvas.height = 200;
+      context = canvas.getContext('2d');
+      drawFrame(performance.now());
+    }
+
+    window.onload = startAnimation;
+    window.onresize = startAnimation;
+    window.addEventListener('pagehide', stopAnimation);
+  </script>
+</body>
+</html>

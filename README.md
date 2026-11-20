@@ -2,15 +2,16 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Two independent **Agent Skills** in one repository for Claude Code, Codex,
+Three independent **Agent Skills** in one repository for Claude Code, Codex,
 OpenClaw, and Hermes:
 
 | Skill | Target | Templates |
 | --- | --- | --- |
 | [streamdock-plugin-builder](skills/streamdock-plugin-builder/SKILL.md) | StreamDock keys, dials, Control Bars and cards | Node.js backend + HTML Property Inspector |
 | [craft-plugin-builder](skills/craft-plugin-builder/SKILL.md) | MiraBox Craft display-only secondary-screen widgets | Two templates: Node.js backend + HTML Property Inspector, or a Vue web app. Node.js is the default; request Vue to use the Vue template. |
+| [syncrgb-effect-builder](skills/syncrgb-effect-builder/SKILL.md) | SyncRGB / Craft RGB lighting animations | HTML Canvas + meta settings; fixed 320×200 backing canvas and 14 locales |
 
-Both skills include their own templates, protocol references, and development/
+Each skill includes their own templates, protocol references, and development/
 build instructions. Craft's Node PI includes QWebChannel and the tested
 registration/settings-routing fixes. Choose Craft for display widgets and
 StreamDock for physical key/dial interactions; their events and install paths
@@ -28,7 +29,7 @@ Run these in Claude Code, in order:
 ```
 
 The first line registers this repo as a plugin marketplace; the second installs
-the plugin containing both skills. It takes effect in a new session.
+the plugin containing all three skills. It takes effect in a new session.
 
 ### Codex (skill-installer)
 
@@ -37,6 +38,7 @@ Run this in Codex:
 ```
 $skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/streamdock-plugin-builder
 $skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/craft-plugin-builder
+$skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/syncrgb-effect-builder
 ```
 
 Codex calls its official script to install the skill into `~/.codex/skills/`.
@@ -50,6 +52,7 @@ Clone the repo, then install the skill from the local path:
 git clone https://github.com/MiraboxSpace/StreamDock-Plugin-Builder
 openclaw skills install ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder
 openclaw skills install ./StreamDock-Plugin-Builder/skills/craft-plugin-builder
+openclaw skills install ./StreamDock-Plugin-Builder/skills/syncrgb-effect-builder
 ```
 
 Add `--global` to install into `~/.openclaw/skills/` for all local agents.
@@ -71,6 +74,8 @@ cp -R ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder \
   ~/.hermes/skills/streamdock-plugin-builder
 cp -R ./StreamDock-Plugin-Builder/skills/craft-plugin-builder \
   ~/.hermes/skills/craft-plugin-builder
+cp -R ./StreamDock-Plugin-Builder/skills/syncrgb-effect-builder \
+  ~/.hermes/skills/syncrgb-effect-builder
 ```
 
 Hermes auto-discovers it on the next startup.
@@ -83,12 +88,13 @@ Install the StreamDock plugin-builder skill from https://github.com/MiraboxSpace
 
 The single-skill prompts above install StreamDock only. For Craft, use the same
 repository with `skills/craft-plugin-builder` and the destination name
-`craft-plugin-builder`; run both installations if both skills are needed.
+`craft-plugin-builder`. Lighting uses `skills/syncrgb-effect-builder` and the
+destination name `syncrgb-effect-builder`. Install the skills you need.
 
 ### Manual install (any agent)
 
 Each skill is a self-contained folder: `skills/streamdock-plugin-builder/`
-or `skills/craft-plugin-builder/`
+`skills/craft-plugin-builder/`, or `skills/syncrgb-effect-builder/`
 (it holds `SKILL.md`, `references/`, and `assets/`). Copy that whole folder into
 the matching directory for your agent:
 
@@ -98,7 +104,7 @@ the matching directory for your agent:
 - Hermes: `~/.hermes/skills/streamdock-plugin-builder/`
 
 For Craft, replace `streamdock-plugin-builder` with `craft-plugin-builder` in
-the destination paths above. Copy both folders separately to install both.
+the destination paths above. Use `syncrgb-effect-builder` for lighting. Copy each desired skill separately.
 Do not copy generated `node_modules/`, `build/`, `log/`, or old ZIP archives.
 
 After copying, the directory should contain `SKILL.md` at its top level (e.g.
@@ -165,9 +171,28 @@ file, installs it, and StreamDock reloads automatically.
 > a development environment. You need to explicitly ask for the build — the
 > agent will not run it automatically.
 
+## SyncRGB lighting effects
+
+Example: “Make a blue breathing effect with adjustable color and speed.”
+Lighting effects use standalone HTML Canvas, not Dock actions or Craft screen
+widgets. The backing canvas is always **320×200**, independent of viewport
+size and devicePixelRatio. Its separate SVG cover is **240×240**.
+Effect folder names use ASCII letters/digits only
+(e.g. `ColorWave`). Meta tags declare controls; 14 flat JSON files translate them.
+
+Installation reads Craft's data directory from HotSpot/configuration.ini and
+copies the effect into `SDModules/mRGB/RGB/<effect-name>`. Without configuration,
+it uses the default Craft data tree. If the default SyncRGB RGB directory also
+exists, it installs an additional copy there; identical paths are deduplicated.
+There is **no development/production distinction**: restart the software after
+installation to discover the effect. Share the `.mRGBEffect` installer: ZIP data
+with files directly at root, no enclosing folder and no `.zip` suffix. Publish
+it on [Space](https://space.mirabox.net/contentUpload) for others to download.
+See the [lighting skill](skills/syncrgb-effect-builder/SKILL.md).
+
 ## Shareable installers
 
-After a confirmed production request, each template's `npm run build` installs
+After a confirmed production request, the Dock and Craft templates' `npm run build` installs
 the production version and automatically creates a shareable installer under
 the project's `release/` directory. Dock `.sdPlugin` ZIPs contain one same-named
 wrapper folder; Craft `.mPanelPlugin` ZIPs put manifest.json directly at root.
@@ -182,13 +207,18 @@ You can share these installers with other users or publish them at
 
 ```text
 streamdock-plugin-builder/
-├── .claude-plugin/       # One plugin discovers both skills
+├── .claude-plugin/       # One plugin discovers all three skills
 ├── .codex-plugin/        # Discovers the skills directory
 └── skills/
     ├── streamdock-plugin-builder/
     │   ├── SKILL.md
     │   ├── references/
     │   └── assets/plugin-template/
+    ├── syncrgb-effect-builder/
+    │   ├── SKILL.md
+    │   ├── references/
+    │   ├── scripts/effect.py
+    │   └── assets/effect-template/ColorWave/
     └── craft-plugin-builder/
         ├── SKILL.md
         ├── references/   # Node docs + vue/
@@ -198,9 +228,9 @@ streamdock-plugin-builder/
 ```
 
 The repository name and plugin ID remain unchanged for existing installations.
-Both skills remain independently installable. Claude Code discovers both via
+All three skills remain independently installable. Claude Code discovers all three via
 the plugin manifest; Codex discovers the skills directory. OpenClaw and Hermes
-can install either folder or both.
+can install any of the skill folders.
 
 ## License
 

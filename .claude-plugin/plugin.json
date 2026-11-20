@@ -1,7 +1,7 @@
 {
   "name": "streamdock-plugin-builder",
-  "description": "Build StreamDock key/dial plugins and MiraBox Craft secondary-screen widgets with two dedicated skills, Node.js templates, a Craft Vue template, Property Inspectors, and build/install workflows.",
-  "version": "1.2.0",
+  "description": "Build StreamDock plugins, MiraBox Craft widgets and SyncRGB lighting effects with three dedicated skills, Node.js/Vue templates, fixed 320x200 lighting canvases, installation and sharing workflows.",
+  "version": "1.3.0",
   "author": {
     "name": "MiraboxSpace"
   },
@@ -13,10 +13,13 @@
     "craft",
     "mirabox",
     "plugin",
-    "property-inspector"
+    "property-inspector",
+    "syncrgb",
+    "lighting"
   ],
   "skills": [
     "./skills/streamdock-plugin-builder",
-    "./skills/craft-plugin-builder"
+    "./skills/craft-plugin-builder",
+    "./skills/syncrgb-effect-builder"
   ]
 }

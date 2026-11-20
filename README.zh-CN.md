@@ -2,15 +2,16 @@
 
 [English](README.md) | **中文**
 
-一个仓库，包含两个独立的 **Agent Skills**，支持 Claude Code、Codex、
+一个仓库，包含三个独立的 **Agent Skills**，支持 Claude Code、Codex、
 OpenClaw 和 Hermes：
 
 | 技能 | 用途 | 模板 |
 | --- | --- | --- |
 | [streamdock-plugin-builder](skills/streamdock-plugin-builder/SKILL.md) | StreamDock 按键、旋钮、控制条和卡片插件 | Node.js 后端 + HTML 属性检查器 |
 | [craft-plugin-builder](skills/craft-plugin-builder/SKILL.md) | MiraBox Craft 纯展示副屏组件 | 支持 Node.js 后端 + HTML 属性检查器、Vue 网页应用两种模板；默认使用 Node.js，也可指定 Vue |
+| [syncrgb-effect-builder](skills/syncrgb-effect-builder/SKILL.md) | SyncRGB / Craft RGB 灯效动画 | HTML Canvas + meta 参数；画布固定 320×200，14 种语言 |
 
-两套技能各自保留模板、协议参考和开发安装流程。Craft Node 模板已包含
+各技能分别提供模板、协议参考和开发安装流程。Craft Node 模板已包含
 QWebChannel，以及实测修复的连接入口与设置消息路由。副屏展示用 Craft，
 实体按键/旋钮交互用 StreamDock，不能混用事件和安装目录。
 
@@ -25,7 +26,7 @@ QWebChannel，以及实测修复的连接入口与设置消息路由。副屏展
 /plugin install streamdock-plugin-builder@streamdock-marketplace
 ```
 
-第一行把本仓库登记为插件市场，第二行安装同时包含两套技能的插件。新开会话即生效。
+第一行把本仓库登记为插件市场，第二行安装同时包含三套技能的插件。新开会话即生效。
 
 ### Codex（skill-installer）
 
@@ -34,6 +35,7 @@ QWebChannel，以及实测修复的连接入口与设置消息路由。副屏展
 ```
 $skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/streamdock-plugin-builder
 $skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/craft-plugin-builder
+$skill-installer install https://github.com/MiraboxSpace/StreamDock-Plugin-Builder/tree/main/skills/syncrgb-effect-builder
 ```
 
 Codex 会调用官方脚本把 skill 装进 `~/.codex/skills/`。装完**重启 Codex**生效。
@@ -46,6 +48,7 @@ Codex 会调用官方脚本把 skill 装进 `~/.codex/skills/`。装完**重启 
 git clone https://github.com/MiraboxSpace/StreamDock-Plugin-Builder
 openclaw skills install ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder
 openclaw skills install ./StreamDock-Plugin-Builder/skills/craft-plugin-builder
+openclaw skills install ./StreamDock-Plugin-Builder/skills/syncrgb-effect-builder
 ```
 
 加 `--global` 可装进 `~/.openclaw/skills/` 供所有本地 agent 使用。新开会话即加载。
@@ -66,6 +69,8 @@ cp -R ./StreamDock-Plugin-Builder/skills/streamdock-plugin-builder \
   ~/.hermes/skills/streamdock-plugin-builder
 cp -R ./StreamDock-Plugin-Builder/skills/craft-plugin-builder \
   ~/.hermes/skills/craft-plugin-builder
+cp -R ./StreamDock-Plugin-Builder/skills/syncrgb-effect-builder \
+  ~/.hermes/skills/syncrgb-effect-builder
 ```
 
 Hermes 下次启动会自动发现它。
@@ -78,12 +83,13 @@ Hermes 下次启动会自动发现它。
 
 上面的单技能提示词只安装 StreamDock；安装 Craft 时使用同一仓库中的
 `skills/craft-plugin-builder`，目标文件夹名也用 `craft-plugin-builder`。
-需要两套时分别安装。
+灯效技能使用 `skills/syncrgb-effect-builder`，目标文件夹为 `syncrgb-effect-builder`。
+按需分别安装。
 
 ### 手动安装（任意智能体）
 
 每个 skill 都是一个自包含文件夹：`skills/streamdock-plugin-builder/` 或
-`skills/craft-plugin-builder/`（内含
+`skills/craft-plugin-builder/`、`skills/syncrgb-effect-builder/`（内含
 `SKILL.md`、`references/`、`assets/`）。把它整个复制到对应智能体的目录：
 
 - Claude Code：`~/.claude/skills/streamdock-plugin-builder/`
@@ -92,7 +98,7 @@ Hermes 下次启动会自动发现它。
 - Hermes：`~/.hermes/skills/streamdock-plugin-builder/`
 
 安装 Craft 时，将上面目标路径中的 `streamdock-plugin-builder` 替换为
-`craft-plugin-builder`。两套技能分别复制；不要携带生成的 `node_modules/`、
+`craft-plugin-builder`。各技能分别复制；不要携带生成的 `node_modules/`、
 `build/`、`log/` 或旧 ZIP。
 
 复制后，该目录顶层应直接有 `SKILL.md`（例如
@@ -149,9 +155,24 @@ StreamDock 自动重载。
 > 插件能在没有开发环境的机器上稳定运行。**打包命令不会自动执行**，
 > 需要你明确告知智能体才会进行。
 
+## SyncRGB 灯效开发
+
+示例：“做一个蓝色呼吸灯效，可以调颜色和速度。”
+灯效使用独立 HTML Canvas 模板，不是 Dock 按键动作或 Craft 副屏组件。
+画布实际尺寸只能是 **320×200**，不随窗口或 DPI 放大；独立 SVG 封面为 **240×240**。
+效果文件夹名只使用
+英文字母和数字，例如 `ColorWave`。meta 标签声明配置项，14 份扁平 JSON 翻译界面。
+
+安装时读取 HotSpot/configuration.ini 中的 Craft 数据目录，将效果复制到
+`SDModules/mRGB/RGB/<效果名>`；配置文件不存在时使用默认 Craft 数据目录。
+默认 SyncRGB 的同名 RGB 目录若也存在，会再同步一份，重复目标自动去重。
+灯效**没有开发版/正式版之分**，安装后重启软件即可识别。
+同步生成 `.mRGBEffect` 安装包供分享：本质为 ZIP，文件直接位于包根目录，不套一层文件夹，也不保留 `.zip` 后缀。可在 [Space](https://space.mirabox.net/contentUpload) 发布供其他用户下载。
+详见 [灯效技能](skills/syncrgb-effect-builder/SKILL.md)。
+
 ## 可分享的插件安装包
 
-用户确认正常或明确要求正式版本后，各模板的 `npm run build` 会完成正式构建、
+用户确认正常或明确要求正式版本后，Dock 和 Craft 模板的 `npm run build` 会完成正式构建、
 本地安装，并在项目的 `release/` 目录同步生成插件安装包。
 Dock 的 `.sdPlugin` 压缩包内包含一层同名文件夹；Craft 的 `.mPanelPlugin`
 压缩包内直接放置 manifest.json，不套文件夹。两种文件均不带 `.zip` 后缀。
@@ -165,13 +186,18 @@ Dock 的 `.sdPlugin` 压缩包内包含一层同名文件夹；Craft 的 `.mPane
 
 ```text
 streamdock-plugin-builder/
-├── .claude-plugin/       # 一个插件发现两套技能
+├── .claude-plugin/       # 一个插件发现三套技能
 ├── .codex-plugin/        # 扫描 skills 目录
 └── skills/
     ├── streamdock-plugin-builder/
     │   ├── SKILL.md
     │   ├── references/
     │   └── assets/plugin-template/
+    ├── syncrgb-effect-builder/
+    │   ├── SKILL.md
+    │   ├── references/
+    │   ├── scripts/effect.py
+    │   └── assets/effect-template/ColorWave/
     └── craft-plugin-builder/
         ├── SKILL.md
         ├── references/   # Node 文档 + vue/
@@ -180,9 +206,9 @@ streamdock-plugin-builder/
             └── vue-template/   # Vue 模板
 ```
 
-为兼容已有安装，仓库名和插件 ID 不变，两套技能仍可以独立安装。
-Claude Code 插件清单注册两套技能，Codex 扫描 skills 目录；
-OpenClaw 和 Hermes 可按需安装其中一套或两套。
+为兼容已有安装，仓库名和插件 ID 不变，三个技能仍可以独立安装。
+Claude Code 插件清单注册三个技能，Codex 扫描 skills 目录；
+OpenClaw 和 Hermes 可按需安装其中一个或多个。
 
 ## License
 
