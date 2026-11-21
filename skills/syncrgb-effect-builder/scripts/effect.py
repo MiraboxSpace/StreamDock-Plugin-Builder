@@ -26,8 +26,22 @@ class EffectHTML(HTMLParser):
         self.scripts = []
         self.in_title = False
         self.script = None
+        self.sections = []
+        self.stack = []
+        self.styles = []
+        self.in_style = False
 
     def handle_starttag(self, tag, attrs):
+        if tag == "html":
+            raise ValueError("Do not add an html root tag")
+        if tag in {"head", "body", "script"}:
+            if self.stack:
+                raise ValueError("head, body and script must be top-level sections")
+            self.sections.append(tag)
+        if tag not in {"meta", "link", "br", "hr", "img", "input", "source", "area", "base", "embed", "param", "track", "wbr"}:
+            self.stack.append(tag)
+        if tag == "style":
+            self.in_style = True
         values = dict(attrs)
         if tag == "canvas":
             self.canvases.append(values)
@@ -41,12 +55,20 @@ class EffectHTML(HTMLParser):
             self.script = ""
 
     def handle_data(self, data):
+        if self.in_style:
+            self.styles.append(data)
         if self.in_title:
             self.titles.append(data)
         if self.script is not None:
             self.script += data
 
     def handle_endtag(self, tag):
+        if tag == "html":
+            raise ValueError("Do not add an html closing tag")
+        if tag == "style":
+            self.in_style = False
+        if tag in self.stack:
+            self.stack = self.stack[:self.stack.index(tag)]
         if tag == "title":
             self.in_title = False
         if tag == "script" and self.script is not None:
@@ -95,6 +117,14 @@ def validate(source):
         raise ValueError("PNG fallback cover must be a real 240 x 240 PNG")
     document = EffectHTML()
     document.feed((source / (source.name + ".html")).read_text(encoding="utf-8-sig"))
+    if document.sections != ["head", "body", "script"]:
+        raise ValueError("Use top-level head, body and script sections in that order")
+    styles = re.sub(r"/\*.*?\*/", "", "".join(document.styles), flags=re.S)
+    for selector in re.findall(r"([^{}]+)\{", styles):
+        if re.search(r"(?<![\w.#-])html(?![\w-])|:root\b", selector, re.I):
+            raise ValueError("Do not style the html root; style body or canvas instead")
+    if any(re.search(r"document\s*\.\s*documentElement\s*\.\s*style\b", script) for script in document.scripts):
+        raise ValueError("Do not set document.documentElement.style")
     if "".join(document.titles).strip() != source.name:
         raise ValueError("HTML title must match the effect folder name")
     if not document.canvases or sum(item.get("id") == "exCanvas" for item in document.canvases) != 1:
@@ -108,7 +138,7 @@ def validate(source):
         if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", name) or name in property_names:
             raise ValueError("Property names must be unique JavaScript identifiers")
         property_names.add(name)
-        if not prop.get("label") or "default" not in prop or prop.get("type") not in {"color", "number", "combobox", "boolean"}:
+        if not prop.get("label") or "default" not in prop or prop.get("type") not in {"color", "number", "combobox", "boolean", "textfield"}:
             raise ValueError("Incomplete property metadata: " + name)
         keys.add(prop["label"])
         if prop["type"] == "combobox":
