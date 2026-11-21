@@ -20,7 +20,7 @@ Vite build in this effect format.
 - Use top-level `<head>`, `<body>` and `<script>` sections, without opening or
   closing `<html>` tags. Do not style the root element with `html`, `html, body`,
   `:root`, or `document.documentElement.style`. Set zero margin, background and
-  overflow on body or canvas only. Other necessary HTML tags are allowed.
+  overflow on body or canvas only.
 - Keep the effect HTML single-file and self-contained, without a build step,
   network requests, external scripts/fonts or machine-specific absolute paths.
 - **Canvas backing size is always exactly 320 × 200.** Keep both HTML width/
